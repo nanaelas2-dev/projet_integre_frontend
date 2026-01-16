@@ -1,0 +1,293 @@
+/*mat-form-field{
+  display: block;
+}
+.login-form{
+  width: 400px;
+  flex: auto;
+  margin: auto ;
+}*/
+/* Container principal - Dégradé rose */
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #f9e3ff 0%, #da8da3 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Carte de connexion */
+.login-form {
+  width: 100%;
+  max-width: 450px;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 15px 35px rgba(212, 123, 168, 0.15);
+  background-color: #fffafc;
+  border: 2px solid #ea9cb1;
+  backdrop-filter: blur(10px);
+}
+
+/* En-tête de la carte */
+mat-card-header {
+  justify-content: center;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+mat-card-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #070204;
+  margin-bottom: 15px;
+  letter-spacing: -0.5px;
+  text-shadow: 2px 2px 4px rgba(233, 30, 99, 0.1);
+  position: relative;
+}
+
+mat-card-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #f48fb1, #e91e63);
+  border-radius: 2px;
+}
+
+/* Divider */
+mat-divider {
+  margin: 25px 0;
+  border-top-color: #ffc1e3;
+  opacity: 0.6;
+}
+
+/* Contenu du formulaire */
+mat-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+/* Champs de formulaire */
+mat-form-field {
+  width: 100%;
+}
+
+/* Style spécifique pour les champs Material */
+::ng-deep .mat-form-field-outline {
+  background-color: #fff5f9;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::ng-deep .mat-form-field-outline-thick {
+  border-width: 2px;
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #f8bbd9;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #e91e63;
+  border-width: 2px;
+}
+
+::ng-deep .mat-form-field-appearance-outline.mat-form-field-can-float.mat-form-field-should-float .mat-form-field-label {
+  color: #e91e63;
+  font-weight: 600;
+}
+
+::ng-deep .mat-input-element {
+  padding: 12px 0;
+  font-size: 16px;
+  color: #ad1457;
+  background-color: transparent;
+  font-weight: 500;
+}
+
+::ng-deep .mat-input-element::placeholder {
+  color: #f48fb1;
+  opacity: 0.7;
+}
+
+/* Label */
+mat-label {
+  font-weight: 600;
+  color: #070204;
+}
+
+/* Actions (boutons) */
+mat-card-actions {
+  padding: 10px 0;
+  margin-bottom: 15px;
+}
+
+/* Bouton de connexion */
+mat-card-actions:first-of-type button[mat-raised-button] {
+  padding: 14px 40px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  background: linear-gradient(45deg, #f06292, #da8da3);
+  color: white;
+  box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
+  border: none;
+  width: 100%;
+  margin-top: 10px;
+}
+
+mat-card-actions:first-of-type button[mat-raised-button]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(233, 30, 99, 0.4);
+  background: linear-gradient(45deg, #ec407a, #d81b60);
+}
+
+mat-card-actions:first-of-type button[mat-raised-button]:active {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+}
+
+/* Bouton d'inscription */
+mat-card-actions:last-of-type button[mat-raised-button] {
+  padding: 12px 35px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: #e91e63;
+  border: 2px solid #f8bbd9;
+  width: 100%;
+}
+
+mat-card-actions:last-of-type button[mat-raised-button]:hover {
+  background: rgba(233, 30, 99, 0.08);
+  border-color: #e91e63;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(233, 30, 99, 0.15);
+}
+
+/* Messages d'erreur */
+mat-error {
+  font-size: 13px;
+  margin-top: 6px;
+  color: #ff4081;
+  font-weight: 500;
+  padding-left: 5px;
+}
+
+/* Animation d'entrée */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.login-form {
+  animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Effet de brillance sur le bouton login */
+@keyframes buttonPulse {
+  0% {
+    box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba(233, 30, 99, 0.5);
+  }
+  100% {
+    box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
+  }
+}
+
+mat-card-actions:first-of-type button[mat-raised-button] {
+  animation: buttonPulse 2s infinite;
+}
+
+/* Hover sur les champs */
+::ng-deep .mat-form-field:hover .mat-form-field-outline {
+  color: #f48fb1;
+  background-color: #fff0f5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+    background: linear-gradient(135deg, #ffe6f2 0%, #ffebf2 100%);
+  }
+
+  .login-form {
+    padding: 30px 25px;
+    margin: 10px;
+    border-radius: 20px;
+    max-width: 400px;
+  }
+
+  mat-card-title {
+    font-size: 28px;
+  }
+
+  mat-card-content {
+    gap: 20px;
+  }
+
+  ::ng-deep .mat-input-element {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    padding: 25px 20px;
+    border-radius: 18px;
+  }
+
+  mat-card-title {
+    font-size: 26px;
+  }
+
+  mat-card-title::after {
+    width: 50px;
+    height: 3px;
+  }
+
+  mat-card-actions:first-of-type button[mat-raised-button],
+  mat-card-actions:last-of-type button[mat-raised-button] {
+    padding: 12px 25px;
+    font-size: 14px;
+  }
+
+  ::ng-deep .mat-input-element {
+    padding: 10px 0;
+  }
+}
+
+/* Effet de focus personnalisé */
+::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  color: #e91e63;
+}
+
+/* Style pour les états désactivés */
+button[mat-raised-button]:disabled {
+  background: linear-gradient(45deg, #f8bbd9, #f48fb1);
+  box-shadow: none;
+  transform: none;
+  animation: none;
+  opacity: 0.7;
+}
+

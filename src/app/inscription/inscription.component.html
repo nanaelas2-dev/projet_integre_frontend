@@ -1,0 +1,52 @@
+<div class="container">
+  <mat-card [formGroup]="userFormGroup" class="inscription-form">
+    <mat-card-header>
+     <mat-card-title> Inscription </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field appearance="outline">
+        <mat-label>Nom</mat-label>
+        <input matInput formControlName="nom">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Prénom</mat-label>
+        <input matInput formControlName="prenom">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>E-mail</mat-label>
+        <input matInput formControlName="email">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput formControlName="password">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tél</mat-label>
+        <input matInput formControlName="tel">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Statut</mat-label>
+        <input matInput formControlName="statut">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>CIN</mat-label>
+        <input matInput formControlName="cin">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description">
+      </mat-form-field>
+
+    </mat-card-content>
+    <mat-card-actions>
+      <button (click)="saveUser()" mat-raised-button color="primary">Envoyer la demande</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
