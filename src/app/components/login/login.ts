@@ -28,7 +28,7 @@ export class Login {
           console.log('Connexion réussie !', user);
 
           // Redirection intelligente selon le rôle calculé par le signal
-          if (user.role === 'ADMINISTRATEUR') {
+          if (user.role === 'ADMIN') {
             this.router.navigateByUrl('/admin');
           } else {
             this.router.navigateByUrl('/dashboard');
