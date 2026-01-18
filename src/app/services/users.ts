@@ -13,4 +13,19 @@ export class Users {
     // On envoie l'objet User complet au format JSON
     return this.http.post(`${environment.apiUrl}/auth/register`, userData);
   }
+
+  // Récupérer les chercheuses en attente
+  getPendingUsers() {
+    return this.http.get<User[]>(`${environment.apiUrl}/admin/pending`);
+  }
+
+  // Approuver une chercheuse (On utilise PUT pour une modification)
+  approveUser(userId: number) {
+    return this.http.put(`${environment.apiUrl}/admin/approve/${userId}`, {});
+  }
+
+  // Rejeter une chercheuse (On utilise DELETE pour la supprimer)
+  rejectUser(userId: number) {
+    return this.http.delete(`${environment.apiUrl}/admin/reject/${userId}`);
+  }
 }
