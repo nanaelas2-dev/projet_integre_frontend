@@ -1,1 +1,10 @@
+<nav>
+  @if (authService.isAuthenticated()) {
+  <div class="user-info">
+    <span>Hello, {{ authService.currentUser()?.prenom }}</span>
+
+    <button (click)="handleLogout()" class="logout-btn">Se déconnecter</button>
+  </div>
+  }
+</nav>
 <p>dashboard works!</p>

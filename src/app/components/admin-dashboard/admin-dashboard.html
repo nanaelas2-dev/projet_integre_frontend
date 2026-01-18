@@ -1,6 +1,15 @@
 <div class="dashboard-container">
   <h1>Validation des Chercheuses STEM</h1>
+  <nav>
 
+    @if (authService.isAuthenticated()) {
+    <div class="user-info">
+      <span>Hello, {{ authService.currentUser()?.prenom }}</span>
+
+      <button (click)="handleLogout()" class="logout-btn">Se déconnecter</button>
+    </div>
+    }
+  </nav>
   <table class="admin-table">
     <thead>
       <tr>

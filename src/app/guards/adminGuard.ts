@@ -1,9 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { Auth } from '../services/auth';
+import { AuthService } from '../services/authService';
 
+// Prevents normal users from entering admin pages.
 export const adminGuard: CanActivateFn = (route, state) => {
-  const authService = inject(Auth);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
   // On récupère l'utilisateur courant depuis le signal

@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { Users } from '../../services/users';
+import { Users } from '../../services/usersService';
 import { User } from '../../models/user';
+import { AuthService } from '../../services/authService';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -9,6 +10,7 @@ import { User } from '../../models/user';
   styleUrl: './admin-dashboard.css',
 })
 export class AdminDashboard implements OnInit {
+  public authService = inject(AuthService);
   private usersService = inject(Users);
 
   // On utilise un Signal pour stocker la liste des chercheuses
@@ -42,5 +44,9 @@ export class AdminDashboard implements OnInit {
         error: (err) => console.error(err),
       });
     }
+  }
+
+  handleLogout() {
+    this.authService.logout();
   }
 }

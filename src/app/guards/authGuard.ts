@@ -1,9 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { Auth } from '../services/auth';
+import { AuthService } from '../services/authService';
 
+// Prevents anonymous users from entering private pages without being logged in.
 export const authGuard: CanActivateFn = (route, state) => {
-  const authService = inject(Auth);
+  const authService = inject(AuthService);
   const router = inject(Router);
 
   // On vérifie le signal d'authentification

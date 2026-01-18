@@ -3,16 +3,39 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '../environments/environment';
 import { tap } from 'rxjs';
 import { User } from '../models/user';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
-export class Auth {
+export class AuthService {
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   // On utilise un Signal pour stocker l'état de l'utilisateur
   currentUser = signal<User | null>(null);
   isAuthenticated = signal<boolean>(false);
+
+  constructor() {
+    // Restore state immediately when service starts
+    this.restoreSession();
+  }
+
+  private restoreSession() {
+    const storedUser = localStorage.getItem('user_data');
+    const storedToken = localStorage.getItem('auth_token');
+
+    if (storedUser && storedToken) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.currentUser.set(user);
+        this.isAuthenticated.set(true);
+      } catch (error) {
+        // If data is corrupted, clear it
+        this.logout();
+      }
+    }
+  }
 
   login(credentials: any) {
     // On fabrique le badge manuellement pour cette PREMIÈRE requête
@@ -40,8 +63,10 @@ export class Auth {
   }
 
   logout() {
+    localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
+    this.router.navigate(['/login']);
   }
 }
