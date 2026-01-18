@@ -1,0 +1,65 @@
+<div class="registration-container">
+  <h2>Rejoindre la communauté STEM</h2>
+
+  <form [formGroup]="registerForm" (ngSubmit)="handleRegister()">
+    <!-- Groupe Nom / Prénom -->
+    <div class="form-group">
+      <label>Nom</label>
+      <input type="text" formControlName="nom" />
+    </div>
+
+    <div class="form-group">
+      <label>Prénom</label>
+      <input type="text" formControlName="prenom" />
+    </div>
+
+    <!-- Email avec validation visuelle -->
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" formControlName="email" />
+
+      <!-- Nouveau Control Flow d'Angular 21 (@if) -->
+      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+      <small class="error-text">Veuillez entrer un email valide.</small>
+      }
+    </div>
+
+    <!-- Mot de passe -->
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" formControlName="password" />
+      @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+      <small class="error-text">Le mot de passe doit faire au moins 6 caractères.</small>
+      }
+    </div>
+
+    <!-- Téléphone -->
+    <div class="form-group">
+      <label>Téléphone</label>
+      <input type="tel" formControlName="telephone" />
+      <!-- si Angular n'a pas encore fini d'initialiser le formulaire, get('email') pourrait renvoyer null.-->
+      <!-- On utilise donc .? pour éviter un crash dans la console. -->
+      @if (registerForm.get('telephone')?.invalid && registerForm.get('telephone')?.touched) {
+      <small class="error-text">Format invalide (10 chiffres requis).</small>
+      }
+    </div>
+
+    <!-- CIN -->
+    <div class="form-group">
+      <label>CIN</label>
+      <input type="text" formControlName="cin" />
+    </div>
+
+    <!-- Bio / Description -->
+    <div class="form-group">
+      <label>Biographie / Parcours</label>
+      <textarea formControlName="description" rows="3"></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="registerForm.invalid">Envoyer ma demande</button>
+      <!-- On utilise routerLink au lieu de href pour les redirections pour ne perdre nos Signals et notre session-->
+      <p>Déjà inscrite ? <a routerLink="/login">Se connecter</a></p>
+    </div>
+  </form>
+</div>
