@@ -1,0 +1,56 @@
+<div class="container">
+  <h2>Ajouter une nouvelle Publication</h2>
+
+  <form [formGroup]="pubForm" (ngSubmit)="onSubmit()">
+    <!-- Category Selection -->
+    <div class="form-group">
+      <label for="categorie">Catégorie</label>
+      <select id="categorie" formControlName="categorie">
+        <option value="" disabled>Sélectionner une catégorie</option>
+
+        @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat }}</option>
+        }
+      </select>
+
+      @if (pubForm.get('categorie')?.touched && pubForm.get('categorie')?.invalid) {
+      <div class="error">La catégorie est requise.</div>
+      }
+    </div>
+
+    <!-- Description Input -->
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        rows="5"
+        formControlName="description"
+        placeholder="De quoi parle votre publication ?"
+      >
+      </textarea>
+
+      @if (pubForm.get('description')?.touched && pubForm.get('description')?.invalid) {
+      <div class="error">La description est requise (min 10 caractères).</div>
+      }
+    </div>
+
+    <!-- Piece Jointe -->
+    <div class="form-group">
+      <label for="pieceJointe">Lien / Pièce Jointe</label>
+      <input
+        type="text"
+        id="pieceJointe"
+        formControlName="pieceJointe"
+        placeholder="Lien vers le document ou nom du fichier"
+      />
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button type="button" routerLink="/dashboard" class="btn-cancel">Annuler</button>
+
+      <!-- Use basic attribute binding for disabled state -->
+      <button type="submit" [disabled]="pubForm.invalid" class="btn-submit">Publier</button>
+    </div>
+  </form>
+</div>

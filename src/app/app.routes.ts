@@ -6,6 +6,8 @@ import { Dashboard } from './components/dashboard/dashboard';
 import { authGuard } from './guards/authGuard';
 import { adminGuard } from './guards/adminGuard';
 import { guestGuard } from './guards/guestGuard';
+import { Chat } from './components/chat/chat';
+import { PublicationCreate } from './components/publication-create/publication-create';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -26,6 +28,16 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'publications/add',
+    component: PublicationCreate,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'chat',
+    component: Chat,
     canActivate: [authGuard],
   },
 
