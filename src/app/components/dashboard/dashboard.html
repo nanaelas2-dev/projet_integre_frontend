@@ -1,18 +1,30 @@
-<nav>
-  @if (authService.isAuthenticated()) {
-  <div class="user-info">
-    <span>Hello, {{ authService.currentUser()?.prenom }}</span>
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="header">
+    <h1>Mon Tableau de Bord</h1>
+    <button routerLink="/publications/add" class="btn-add">+ Nouvelle Publication</button>
+  </header>
 
-    <button (click)="handleLogout()" class="logout-btn">Se déconnecter</button>
+  <!-- Content -->
+  <div class="content">
+    <h3>Mes Publications ({{ publications().length }})</h3>
+
+    @if (isLoading()) {
+    <p>Chargement...</p>
+    } @else if (publications().length === 0) {
+    <p class="empty-state">Vous n'avez rien publié pour l'instant.</p>
+    }
+
+    <!-- LIST OF CARDS -->
+    <!-- this is where the input output gets sent-->
+    <!-- currentUserId gets retrieved from the dashboard ts, and deleted is the event that gets triggered when emitted responds-->
+    @for (pub of publications(); track pub.id) {
+    <app-publication-card
+      [publication]="pub"
+      [userId]="currentUserId"
+      (deleted)="removePublication($event)"
+    >
+    </app-publication-card>
+    }
   </div>
-  }
-</nav>
-
-<button routerLink="/publications/add">
-  + Ajouter Publication
-</button>
-
-<p>dashboard works!</p>
-
-<!-- Chat Component -->
-<app-chat />
+</div>

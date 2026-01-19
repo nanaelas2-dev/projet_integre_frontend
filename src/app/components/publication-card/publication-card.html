@@ -1,0 +1,50 @@
+<div class="card">
+  <!-- === VIEW MODE === -->
+  @if (!isEditing()) {
+  <div class="card-header">
+    <span class="badge">{{ publication.categorie }}</span>
+    <span class="date">{{ publication.datePublication | date:'mediumDate' }}</span>
+  </div>
+
+  <div class="card-body">
+    <p>{{ publication.description }}</p>
+
+    @if (publication.pieceJointe) {
+    <a [href]="publication.pieceJointe" target="_blank" class="attachment-link">
+      📎 Voir la pièce jointe
+    </a>
+    }
+  </div>
+
+  <div class="card-footer">
+    <button (click)="toggleEdit()" class="btn-edit">Modifier</button>
+    <button (click)="onDelete()" class="btn-delete">Supprimer</button>
+  </div>
+  }
+
+  <!-- === EDIT MODE === -->
+  @else {
+  <form [formGroup]="editForm" (ngSubmit)="onSave()">
+    <div class="form-group">
+      <select formControlName="categorie">
+        @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <textarea formControlName="description" rows="4"></textarea>
+    </div>
+
+    <div class="form-group">
+      <input type="text" formControlName="pieceJointe" placeholder="Lien pièce jointe" />
+    </div>
+
+    <div class="card-footer">
+      <button type="button" (click)="toggleEdit()" class="btn-cancel">Annuler</button>
+      <button type="submit" [disabled]="editForm.invalid" class="btn-save">Enregistrer</button>
+    </div>
+  </form>
+  }
+</div>

@@ -13,4 +13,19 @@ export class PublicationService {
   createPublication(request: PublicationRequest): Observable<Publication> {
     return this.http.post<Publication>(this.apiUrl, request);
   }
+
+  // Get only the logged-in user's publications
+  getByUser(userId: number): Observable<Publication[]> {
+    return this.http.get<Publication[]>(`${this.apiUrl}/utilisatrice/${userId}`);
+  }
+
+  // Update
+  updatePublication(id: number, request: PublicationRequest): Observable<Publication> {
+    return this.http.put<Publication>(`${this.apiUrl}/${id}`, request);
+  }
+
+  // Delete
+  deletePublication(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }
