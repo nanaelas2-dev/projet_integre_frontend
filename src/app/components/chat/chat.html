@@ -1,0 +1,71 @@
+<!-- Floating Chat Button -->
+<button class="chat-toggle" (click)="toggleChat()">
+  💬
+  @if (unreadCount() > 0) {
+    <span class="badge">{{ unreadCount() }}</span>
+  }
+</button>
+
+<!-- Chat Panel -->
+@if (isOpen()) {
+  <div class="chat-panel">
+    <div class="chat-header">
+      @if (selectedConversation()) {
+        <button class="back-btn" (click)="backToList()">←</button>
+        <span>{{ selectedConversation()?.autreParticipanteNom }}</span>
+      } @else {
+        <span>Messages</span>
+      }
+      <button class="close-btn" (click)="toggleChat()">×</button>
+    </div>
+
+    <div class="chat-body">
+      @if (!selectedConversation()) {
+        <!-- Conversations List -->
+        <div class="conversations-list">
+          @for (conv of conversations(); track conv.id) {
+            <div class="conversation-item" (click)="selectConversation(conv)">
+              <div class="conv-avatar">{{ conv.autreParticipanteNom.charAt(0) }}</div>
+              <div class="conv-info">
+                <div class="conv-name">{{ conv.autreParticipanteNom }}</div>
+                <div class="conv-preview">{{ conv.dernierMessage }}</div>
+              </div>
+              @if (conv.nonLus > 0) {
+                <span class="conv-badge">{{ conv.nonLus }}</span>
+              }
+            </div>
+          } @empty {
+            <p class="empty-state">Aucune conversation</p>
+          }
+        </div>
+      } @else {
+        <!-- Messages View -->
+        <div class="messages-container">
+          @for (msg of messages(); track msg.id) {
+            <div class="message" [class.own]="isOwnMessage(msg.expeditricId)">
+              <div class="message-content">{{ msg.contenu }}</div>
+              <div class="message-time">
+                {{ msg.dateEnvoi | date:'HH:mm' }}
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-state">Aucun message</p>
+          }
+        </div>
+      }
+    </div>
+
+    @if (selectedConversation()) {
+      <div class="chat-footer">
+        <input
+          type="text"
+          [ngModel]="newMessage()"
+          (ngModelChange)="newMessage.set($event)"
+          (keyup.enter)="sendMessage()"
+          placeholder="Écrire un message..."
+        />
+        <button class="send-btn" (click)="sendMessage()">➤</button>
+      </div>
+    }
+  </div>
+}
