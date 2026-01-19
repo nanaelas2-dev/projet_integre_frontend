@@ -1,12 +1,12 @@
-import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
 import { Categorie, Publication, PublicationRequest } from '../../models/publication';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicationService } from '../../services/publicationService';
-import { DatePipe } from '@angular/common';
+import { DatePipe, UpperCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-publication-card',
-  imports: [DatePipe, ReactiveFormsModule],
+  imports: [DatePipe, UpperCasePipe, ReactiveFormsModule],
   templateUrl: './publication-card.html',
   styleUrl: './publication-card.css',
 })
@@ -22,6 +22,19 @@ export class PublicationCard {
   // State
   isEditing = signal(false);
   categories = Object.values(Categorie);
+
+  // Computed Signal for Ownership
+  isOwner = computed(() => {
+    // Compare LoggedIn ID vs Author ID
+    return this.userId === this.publication.utilisatrice.id;
+  });
+
+  // Helper to show initials
+  getInitials(): string {
+    const p = this.publication.utilisatrice.prenom.charAt(0);
+    const n = this.publication.utilisatrice.nom.charAt(0);
+    return (p + n).toUpperCase();
+  }
 
   // Form
   editForm = this.fb.group({

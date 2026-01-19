@@ -1,0 +1,39 @@
+<div class="feed-layout">
+  <!-- LEFT SIDEBAR: Filters (Desktop) -->
+  <aside class="sidebar">
+    <h3>Filtres</h3>
+    <button [class.active]="currentFilter() === 'ALL'" (click)="filter('ALL')">🌍 Tout voir</button>
+
+    <div class="separator"></div>
+
+    @for (cat of categories; track cat) {
+    <button [class.active]="currentFilter() === cat" (click)="filter(cat)"># {{ cat }}</button>
+    }
+  </aside>
+
+  <!-- MAIN CONTENT: The Feed -->
+  <main class="feed-content">
+    <div class="feed-header">
+      <h2>Fil d'actualité</h2>
+    </div>
+
+    @if (isLoading()) {
+    <div class="loading-spinner">Chargement...</div>
+    } @if (!isLoading() && publications().length === 0) {
+    <div class="empty-state">
+      <p>Aucune publication pour le moment.</p>
+    </div>
+    }
+
+    <div class="posts-list">
+      @for (pub of publications(); track pub.id) {
+      <app-publication-card
+        [publication]="pub"
+        [userId]="currentUserId"
+        (deleted)="removePublication($event)"
+      >
+      </app-publication-card>
+      }
+    </div>
+  </main>
+</div>
