@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Publication, PublicationRequest } from '../models/publication';
+import { Categorie, Publication, PublicationRequest } from '../models/publication';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -14,7 +14,17 @@ export class PublicationService {
     return this.http.post<Publication>(this.apiUrl, request);
   }
 
-  // Get only the logged-in user's publications
+  // Get All Publications (For the Feed)
+  getAllPublications(): Observable<Publication[]> {
+    return this.http.get<Publication[]>(this.apiUrl);
+  }
+
+  // Get by Category (For Feed Filters)
+  getPublicationsByCategorie(categorie: Categorie): Observable<Publication[]> {
+    return this.http.get<Publication[]>(`${this.apiUrl}/categorie/${categorie}`);
+  }
+
+  // Get only the logged-in user's publications for dashboard
   getByUser(userId: number): Observable<Publication[]> {
     return this.http.get<Publication[]>(`${this.apiUrl}/utilisatrice/${userId}`);
   }

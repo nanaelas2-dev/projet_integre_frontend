@@ -3,11 +3,10 @@ export enum Categorie {
   ACHIEVEMENT = 'ACHIEVEMENT',
 }
 
-export interface PublicationRequest {
-  utilisatriceId: number;
-  description: string;
-  pieceJointe: string;
-  categorie: Categorie;
+export interface Author {
+  id: number;
+  nom: string;
+  prenom: string;
 }
 
 export interface Publication {
@@ -16,4 +15,13 @@ export interface Publication {
   pieceJointe: string;
   categorie: Categorie;
   datePublication?: string;
+
+  utilisatrice: Author;
+}
+
+export interface PublicationRequest {
+  utilisatriceId: number;
+  description: string;
+  pieceJointe: string;
+  categorie: Categorie;
 }

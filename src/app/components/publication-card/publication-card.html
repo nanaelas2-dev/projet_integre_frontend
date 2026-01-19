@@ -1,50 +1,60 @@
 <div class="card">
-  <!-- === VIEW MODE === -->
-  @if (!isEditing()) {
+  <!-- HEADER: Author & Date -->
   <div class="card-header">
-    <span class="badge">{{ publication.categorie }}</span>
-    <span class="date">{{ publication.datePublication | date:'mediumDate' }}</span>
+    <div class="meta-left">
+      <!-- Avatar Circle (Initials) -->
+      <div class="avatar">{{ getInitials() }}</div>
+      <div class="info">
+        <!-- Author Name -->
+        <span class="author-name">
+          {{ publication.utilisatrice.prenom }} {{ publication.utilisatrice.nom | uppercase }}
+        </span>
+        <span class="pub-date">{{ publication.datePublication | date:'dd MMM yyyy, HH:mm' }}</span>
+      </div>
+    </div>
+
+    <span class="category-badge">{{ publication.categorie }}</span>
   </div>
 
+  <!-- BODY -->
   <div class="card-body">
-    <p>{{ publication.description }}</p>
+    @if (!isEditing()) {
+    <p class="description">{{ publication.description }}</p>
 
     @if (publication.pieceJointe) {
-    <a [href]="publication.pieceJointe" target="_blank" class="attachment-link">
-      📎 Voir la pièce jointe
-    </a>
+    <a [href]="publication.pieceJointe" target="_blank" class="attachment"> 📎 Pièce jointe </a>
+    } } @else {
+    <!-- EDIT FORM -->
+    <form [formGroup]="editForm" (ngSubmit)="onSave()">
+      <div class="form-group">
+        <select formControlName="categorie">
+          @for (cat of categories; track cat) {
+          <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <textarea formControlName="description" rows="4"></textarea>
+      </div>
+
+      <div class="form-group">
+        <input type="text" formControlName="pieceJointe" placeholder="Lien pièce jointe" />
+      </div>
+
+      <div class="edit-actions">
+        <button type="button" (click)="toggleEdit()" class="btn-cancel">Annuler</button>
+        <button type="submit" class="btn-save">Sauvegarder</button>
+      </div>
+    </form>
     }
   </div>
 
+  <!-- FOOTER: Only show if OWNING the post -->
+  @if (!isEditing() && isOwner()) {
   <div class="card-footer">
-    <button (click)="toggleEdit()" class="btn-edit">Modifier</button>
-    <button (click)="onDelete()" class="btn-delete">Supprimer</button>
+    <button (click)="toggleEdit()" class="btn-icon">Modifier</button>
+    <button (click)="onDelete()" class="btn-icon delete">Supprimer</button>
   </div>
-  }
-
-  <!-- === EDIT MODE === -->
-  @else {
-  <form [formGroup]="editForm" (ngSubmit)="onSave()">
-    <div class="form-group">
-      <select formControlName="categorie">
-        @for (cat of categories; track cat) {
-        <option [value]="cat">{{ cat }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="form-group">
-      <textarea formControlName="description" rows="4"></textarea>
-    </div>
-
-    <div class="form-group">
-      <input type="text" formControlName="pieceJointe" placeholder="Lien pièce jointe" />
-    </div>
-
-    <div class="card-footer">
-      <button type="button" (click)="toggleEdit()" class="btn-cancel">Annuler</button>
-      <button type="submit" [disabled]="editForm.invalid" class="btn-save">Enregistrer</button>
-    </div>
-  </form>
   }
 </div>

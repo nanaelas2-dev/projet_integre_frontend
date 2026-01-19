@@ -8,6 +8,7 @@ import { adminGuard } from './guards/adminGuard';
 import { guestGuard } from './guards/guestGuard';
 import { Chat } from './components/chat/chat';
 import { PublicationCreate } from './components/publication-create/publication-create';
+import { FeedComponent } from './components/feed/feed';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -33,6 +34,11 @@ export const routes: Routes = [
   {
     path: 'publications/add',
     component: PublicationCreate,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'feed',
+    component: FeedComponent,
     canActivate: [authGuard],
   },
   {
