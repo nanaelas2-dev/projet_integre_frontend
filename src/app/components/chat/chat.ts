@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from '../../services/chatService';
 import { AuthService } from '../../services/authService';
-import { Users } from '../../services/usersService';
+import { FriendService } from '../../services/friendService';
 import { ConversationDTO, EnvoyerMessageRequest } from '../../models/chat';
-import { User } from '../../models/user';
+import { AmieDTO } from '../../models/friend';
 
 @Component({
   selector: 'app-chat',
@@ -17,25 +17,26 @@ import { User } from '../../models/user';
 export class Chat implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
   private authService = inject(AuthService);
-  private usersService = inject(Users);
+  private friendService = inject(FriendService);
 
   // Expose signals to template
   conversations = this.chatService.conversations;
   messages = this.chatService.currentMessages;
   isConnected = this.chatService.isConnected;
+  friends = this.friendService.friends;
 
   // Local state
   selectedConversation = signal<ConversationDTO | null>(null);
+  selectedFriend = signal<AmieDTO | null>(null);
   newMessage = signal<string>('');
   isOpen = signal<boolean>(false);
   showNewChat = signal<boolean>(false);
-  availableUsers = signal<User[]>([]);
-  selectedUser = signal<User | null>(null);
 
   ngOnInit(): void {
     this.chatService.connect();
     this.chatService.loadConversations();
     this.chatService.loadUnreadCount();
+    this.friendService.loadFriends();
   }
 
   ngOnDestroy(): void {
@@ -44,18 +45,46 @@ export class Chat implements OnInit, OnDestroy {
 
   toggleChat(): void {
     this.isOpen.update((v) => !v);
+    if (this.isOpen()) {
+      this.chatService.loadConversations();
+      this.friendService.loadFriends();
+    }
   }
 
   selectConversation(conversation: ConversationDTO): void {
     this.selectedConversation.set(conversation);
+    this.selectedFriend.set(null);
+    this.showNewChat.set(false);
     this.chatService.loadMessages(conversation.id);
     this.chatService.subscribeToConversation(conversation.id);
     this.chatService.markAsRead(conversation.id);
   }
 
+  openNewChat(): void {
+    this.showNewChat.set(true);
+    this.selectedConversation.set(null);
+    this.selectedFriend.set(null);
+    this.friendService.loadFriends();
+  }
+
+  selectFriendForChat(friend: AmieDTO): void {
+    // Check if conversation already exists with this friend
+    const existingConvo = this.conversations().find(
+      (c) => c.autreParticipanteId === friend.id
+    );
+
+    if (existingConvo) {
+      this.selectConversation(existingConvo);
+    } else {
+      this.selectedFriend.set(friend);
+      this.showNewChat.set(false);
+      this.chatService.currentMessages.set([]);
+    }
+  }
+
   backToList(): void {
     this.selectedConversation.set(null);
-    this.selectedUser.set(null);
+    this.selectedFriend.set(null);
     this.showNewChat.set(false);
     this.chatService.currentMessages.set([]);
   }
@@ -81,13 +110,12 @@ export class Chat implements OnInit, OnDestroy {
     const user = this.authService.currentUser();
     if (!content || !user) return;
 
-    // Determine recipient
     let destinataireId: number | undefined;
-    
+
     if (this.selectedConversation()) {
       destinataireId = this.selectedConversation()!.autreParticipanteId;
-    } else if (this.selectedUser()) {
-      destinataireId = this.selectedUser()!.id;
+    } else if (this.selectedFriend()) {
+      destinataireId = this.selectedFriend()!.id;
     }
 
     if (!destinataireId) return;
@@ -98,22 +126,34 @@ export class Chat implements OnInit, OnDestroy {
       contenu: content,
     };
 
-    // Use REST API and handle response
+    // Use REST API for reliable message sending
     this.chatService.sendMessageRest(request).subscribe({
       next: (msg) => {
-        // Add message to display
-        this.chatService.currentMessages.update(msgs => [...msgs, msg]);
-        // Refresh conversations
+        this.chatService.currentMessages.update((msgs) => [...msgs, msg]);
         this.chatService.loadConversations();
-        // If new chat, set the conversation
-        if (this.selectedUser() && msg.conversationId) {
-          this.chatService.loadMessages(msg.conversationId);
-          this.selectedUser.set(null);
+
+        // If new chat with friend, update to use conversation
+        if (this.selectedFriend() && msg.conversationId) {
+          const friend = this.selectedFriend()!;
+          this.selectedFriend.set(null);
+          this.selectedConversation.set({
+            id: msg.conversationId,
+            autreParticipanteId: friend.id,
+            autreParticipanteNom: friend.nom,
+            autreParticipantePrenom: friend.prenom,
+            dernierMessage: msg.contenu,
+            dernierMessageDate: msg.dateEnvoi,
+            messagesNonLus: 0,
+          });
+          this.chatService.subscribeToConversation(msg.conversationId);
         }
       },
-      error: (err) => console.error('Failed to send message:', err)
+      error: (err) => {
+        console.error('Failed to send message:', err);
+        alert(err.error || 'Erreur lors de l\'envoi du message');
+      },
     });
-    
+
     this.newMessage.set('');
   }
 
@@ -126,15 +166,17 @@ export class Chat implements OnInit, OnDestroy {
   }
 
   get canSendMessage(): boolean {
-    return !!(this.selectedConversation() || this.selectedUser());
+    return !!(this.selectedConversation() || this.selectedFriend());
   }
 
   get chatTitle(): string {
     if (this.selectedConversation()) {
-      return this.selectedConversation()!.autreParticipanteNom;
+      const c = this.selectedConversation()!;
+      return `${c.autreParticipantePrenom} ${c.autreParticipanteNom}`;
     }
-    if (this.selectedUser()) {
-      return `${this.selectedUser()!.prenom} ${this.selectedUser()!.nom}`;
+    if (this.selectedFriend()) {
+      const f = this.selectedFriend()!;
+      return `${f.prenom} ${f.nom}`;
     }
     return 'Messages';
   }

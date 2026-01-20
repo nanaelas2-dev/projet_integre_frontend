@@ -5,10 +5,11 @@ import { PublicationCard } from '../publication-card/publication-card';
 import { PublicationService } from '../../services/publicationService';
 import { Publication } from '../../models/publication';
 import { Chat } from '../chat/chat';
+import { Friends } from '../friends/friends';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, PublicationCard, Chat],
+  imports: [RouterLink, PublicationCard, Chat, Friends],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

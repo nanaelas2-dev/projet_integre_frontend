@@ -29,7 +29,7 @@ export class Users {
     return this.http.delete(`${environment.apiUrl}/admin/reject/${userId}`);
   }
 
-  // Get all users for chat
+  // Get all users for search/chat
   getAllUsers() {
     return this.http.get<User[]>(`${environment.apiUrl}/users`);
   }
