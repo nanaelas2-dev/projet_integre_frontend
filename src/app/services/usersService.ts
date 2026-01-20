@@ -28,4 +28,9 @@ export class Users {
   rejectUser(userId: number) {
     return this.http.delete(`${environment.apiUrl}/admin/reject/${userId}`);
   }
+
+  // Get all users for chat
+  getAllUsers() {
+    return this.http.get<User[]>(`${environment.apiUrl}/users`);
+  }
 }

@@ -204,3 +204,33 @@
   color: #9ca3af;
   padding: 40px;
 }
+
+.new-chat-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 8px;
+  margin-left: auto;
+}
+
+.start-chat-btn {
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.start-chat-btn:hover {
+  background: #4f46e5;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
