@@ -69,9 +69,7 @@ export class Chat implements OnInit, OnDestroy {
 
   selectFriendForChat(friend: AmieDTO): void {
     // Check if conversation already exists with this friend
-    const existingConvo = this.conversations().find(
-      (c) => c.autreParticipanteId === friend.id
-    );
+    const existingConvo = this.conversations().find((c) => c.autreParticipanteId === friend.id);
 
     if (existingConvo) {
       this.selectConversation(existingConvo);
@@ -87,22 +85,6 @@ export class Chat implements OnInit, OnDestroy {
     this.selectedFriend.set(null);
     this.showNewChat.set(false);
     this.chatService.currentMessages.set([]);
-  }
-
-  openNewChat(): void {
-    this.showNewChat.set(true);
-    this.usersService.getAllUsers().subscribe({
-      next: (users) => {
-        const currentUserId = this.authService.currentUser()?.id;
-        this.availableUsers.set(users.filter(u => u.id !== currentUserId));
-      },
-      error: (err) => console.error('Failed to load users:', err)
-    });
-  }
-
-  selectUserForChat(user: User): void {
-    this.selectedUser.set(user);
-    this.showNewChat.set(false);
   }
 
   sendMessage(): void {
@@ -150,7 +132,7 @@ export class Chat implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Failed to send message:', err);
-        alert(err.error || 'Erreur lors de l\'envoi du message');
+        alert(err.error || "Erreur lors de l'envoi du message");
       },
     });
 
