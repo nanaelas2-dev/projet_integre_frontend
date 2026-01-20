@@ -1,39 +1,88 @@
-<div class="dashboard-container">
-  <!-- Header -->
-  <header class="header">
-    <h1>Mon Tableau de Bord</h1>
-    <div class="header-actions">
-      <button routerLink="/publications/add" class="btn-add">+ Nouvelle Publication</button>
-      <button (click)="logout()" class="btn-logout">Déconnexion</button>
-    </div>
-  </header>
-
-  <!-- Content -->
-  <div class="content">
-    <h3>Mes Publications ({{ publications().length }})</h3>
-
-    @if (isLoading()) {
-    <p>Chargement...</p>
-    } @else if (publications().length === 0) {
-    <p class="empty-state">Vous n'avez rien publié pour l'instant.</p>
-    }
-
-    <!-- LIST OF CARDS -->
-    <!-- this is where the input output gets sent-->
-    <!-- currentUserId gets retrieved from the dashboard ts, and deleted is the event that gets triggered when emitted responds-->
-    @for (pub of publications(); track pub.id) {
-    <app-publication-card
-      [publication]="pub"
-      [userId]="currentUserId"
-      (deleted)="removePublication($event)"
-    >
-    </app-publication-card>
-    }
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-brand">STEM Connect</div>
+  <div class="nav-tabs">
+    <button 
+      [class.active]="activeTab() === 'profile'" 
+      (click)="setTab('profile')">
+      Profil
+    </button>
+    <button 
+      [class.active]="activeTab() === 'feed'" 
+      (click)="setTab('feed')">
+      Fil d'actualités
+    </button>
   </div>
-</div>
+  <div class="nav-actions">
+    <button (click)="logout()" class="btn-logout">Déconnexion</button>
+  </div>
+</nav>
 
-<!-- Friends Component -->
+<!-- Main Content -->
+<main class="main-content">
+  <!-- Profile Tab -->
+  @if (activeTab() === 'profile') {
+    <div class="profile-container">
+      <!-- Profile Header -->
+      <section class="profile-header">
+        <div class="avatar-large">
+          {{ auth.currentUser()?.prenom?.charAt(0) }}{{ auth.currentUser()?.nom?.charAt(0) }}
+        </div>
+        <div class="profile-info">
+          <h1 class="profile-name">{{ auth.currentUser()?.prenom }} {{ auth.currentUser()?.nom }}</h1>
+          <p class="profile-email">{{ auth.currentUser()?.email }}</p>
+          @if (auth.currentUser()?.description) {
+            <p class="profile-description">{{ auth.currentUser()?.description }}</p>
+          } @else {
+            <p class="profile-description empty">Aucune description</p>
+          }
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="profile-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ publications().length }}</span>
+          <span class="stat-label">Publications</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ friends().length }}</span>
+          <span class="stat-label">Amies</span>
+        </div>
+      </section>
+
+      <!-- User Publications -->
+      <section class="profile-publications">
+        <div class="section-header">
+          <h2>Mes Publications</h2>
+          <button routerLink="/publications/add" class="btn-add">+ Nouvelle</button>
+        </div>
+
+        @if (isLoading()) {
+          <p class="loading">Chargement...</p>
+        } @else if (publications().length === 0) {
+          <p class="empty-state">Vous n'avez rien publié pour l'instant.</p>
+        } @else {
+          <div class="publications-list">
+            @for (pub of publications(); track pub.id) {
+              <app-publication-card
+                [publication]="pub"
+                [userId]="currentUserId"
+                (deleted)="removePublication($event)"
+              />
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+
+  <!-- Feed Tab -->
+  @if (activeTab() === 'feed') {
+    <app-feed />
+  }
+</main>
+
+<!-- Floating Components (always visible) -->
 <app-friends />
-
-<!-- Chat Component -->
 <app-chat />

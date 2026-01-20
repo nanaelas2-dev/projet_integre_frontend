@@ -1,10 +1,11 @@
-import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { Component, computed, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { Categorie, Publication, PublicationRequest } from '../../models/publication';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicationService } from '../../services/publicationService';
 import { DatePipe, UpperCasePipe } from '@angular/common';
-import { Commentaire, CreateCommentaireRequest } from '../../models/commentaire';
-import { CommentaireService } from '../../services/commentaireService';
+import { CommentService } from '../../services/commentService';
+import { Commentaire } from '../../models/comment';
+import { AuthService } from '../../services/authService';
 
 @Component({
   selector: 'app-publication-card',
@@ -12,19 +13,31 @@ import { CommentaireService } from '../../services/commentaireService';
   templateUrl: './publication-card.html',
   styleUrl: './publication-card.css',
 })
-export class PublicationCard {
+export class PublicationCard implements OnInit {
   // Inputs/Outputs
   @Input({ required: true }) publication!: Publication;
   @Input({ required: true }) userId!: number; // Needed to rebuild DTO
   @Output() deleted = new EventEmitter<number>(); // Notify parent to remove from list
 
   private service = inject(PublicationService);
+  private commentService = inject(CommentService);
+  private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private commentaireService = inject(CommentaireService);
 
   // State
   isEditing = signal(false);
   categories = Object.values(Categorie);
+  
+  // Comments state
+  comments = signal<Commentaire[]>([]);
+  showComments = signal(false);
+  newComment = '';
+  isLoadingComments = signal(false);
+
+  ngOnInit() {
+    this.loadComments();
+  }
 
   // --- NEW COMMENT SIGNALS ---
   // Controls visibility (Is the comment box open or closed?)
@@ -106,66 +119,60 @@ export class PublicationCard {
     }
   }
 
-  // Toggle visibility and load data if needed
-  toggleComments() {
-    // Flip the switch (Open -> Close, or Close -> Open)
-    this.showComments.set(!this.showComments());
-
-    // The "Lazy" Check:
-    // IF the box is now OPEN...
-    // AND we haven't fetched the comments yet (length is 0)...
-    if (this.showComments() && this.comments().length === 0) {
-      this.loadComments();
-    }
-  }
-
-  // Fetch from API
+  // Comments methods
   loadComments() {
     this.isLoadingComments.set(true);
-    this.commentaireService.getByPublication(this.publication.id).subscribe({
+    this.commentService.getCommentsByPublication(this.publication.id).subscribe({
       next: (data) => {
         this.comments.set(data);
         this.isLoadingComments.set(false);
       },
-      error: () => this.isLoadingComments.set(false),
-    });
-  }
-
-  // Post a new comment
-  addComment() {
-    const text = this.newCommentText().trim();
-    if (!text) return;
-
-    const req: CreateCommentaireRequest = {
-      contenu: text,
-      idUtilisateur: this.userId,
-      idPublication: this.publication.id,
-    };
-
-    this.commentaireService.create(req).subscribe({
-      next: (newComment) => {
-        // Update the UI *immediately*
-        // We take the new comment from the backend...
-        // And add it to the FRONT of the existing list (...list)
-        this.comments.update((list) => [newComment, ...list]);
-        this.newCommentText.set(''); // Clear input box
+      error: (err) => {
+        console.error('Error loading comments:', err);
+        this.isLoadingComments.set(false);
       },
     });
   }
 
-  // Delete comment (if owner)
+  toggleComments() {
+    this.showComments.set(!this.showComments());
+  }
+
+  addComment() {
+    if (!this.newComment.trim()) return;
+
+    const currentUser = this.authService.currentUser();
+    if (!currentUser) return;
+
+    const request = {
+      contenu: this.newComment.trim(),
+      idUtilisateur: currentUser.id,
+      idPublication: this.publication.id,
+    };
+
+    this.commentService.addComment(request).subscribe({
+      next: (comment) => {
+        this.comments.update(prev => [...prev, comment]);
+        this.newComment = '';
+      },
+      error: (err) => console.error('Error adding comment:', err),
+    });
+  }
+
   deleteComment(commentId: number) {
-    if (confirm('Supprimer ce commentaire ?')) {
-      this.commentaireService.delete(commentId).subscribe({
+    if (confirm('Voulez-vous supprimer ce commentaire ?')) {
+      this.commentService.deleteComment(commentId).subscribe({
         next: () => {
-          this.comments.update((list) => list.filter((c) => c.id !== commentId));
+          this.comments.update(prev => prev.filter(c => c.id !== commentId));
         },
+        error: (err) => console.error('Error deleting comment:', err),
       });
     }
   }
 
-  // Helper check for comment ownership
-  isCommentOwner(comment: Commentaire): boolean {
-    return comment.utilisateur.id === this.userId;
+  getCommentAuthorInitials(comment: Commentaire): string {
+    const prenom = comment.prenomUtilisateur || 'U';
+    const nom = comment.nomUtilisateur || 'U';
+    return (prenom.charAt(0) + nom.charAt(0)).toUpperCase();
   }
 }
