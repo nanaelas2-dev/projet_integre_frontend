@@ -4,10 +4,11 @@ import { RouterLink } from '@angular/router';
 import { PublicationCard } from '../publication-card/publication-card';
 import { PublicationService } from '../../services/publicationService';
 import { Publication } from '../../models/publication';
+import { Chat } from '../chat/chat';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, PublicationCard],
+  imports: [RouterLink, PublicationCard, Chat],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -49,5 +50,9 @@ export class Dashboard implements OnInit {
     // "Keep every publication where the ID is NOT the one we just deleted"
     // This avoids the call of the full reload with loadPublications
     this.publications.update((oldList) => oldList.filter((p) => p.id !== idToDelete));
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

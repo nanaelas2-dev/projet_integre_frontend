@@ -10,17 +10,33 @@
 @if (isOpen()) {
   <div class="chat-panel">
     <div class="chat-header">
-      @if (selectedConversation()) {
+      @if (selectedConversation() || selectedUser() || showNewChat()) {
         <button class="back-btn" (click)="backToList()">←</button>
-        <span>{{ selectedConversation()?.autreParticipanteNom }}</span>
+        <span>{{ showNewChat() ? 'Nouveau message' : chatTitle }}</span>
       } @else {
         <span>Messages</span>
+        <button class="new-chat-btn" (click)="openNewChat()">+</button>
       }
       <button class="close-btn" (click)="toggleChat()">×</button>
     </div>
 
     <div class="chat-body">
-      @if (!selectedConversation()) {
+      @if (showNewChat()) {
+        <!-- User Selection for New Chat -->
+        <div class="users-list">
+          @for (user of availableUsers(); track user.id) {
+            <div class="conversation-item" (click)="selectUserForChat(user)">
+              <div class="conv-avatar">{{ user.prenom.charAt(0) }}</div>
+              <div class="conv-info">
+                <div class="conv-name">{{ user.prenom }} {{ user.nom }}</div>
+                <div class="conv-preview">{{ user.email }}</div>
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-state">Aucun utilisateur disponible</p>
+          }
+        </div>
+      } @else if (!selectedConversation() && !selectedUser()) {
         <!-- Conversations List -->
         <div class="conversations-list">
           @for (conv of conversations(); track conv.id) {
@@ -35,7 +51,10 @@
               }
             </div>
           } @empty {
-            <p class="empty-state">Aucune conversation</p>
+            <div class="empty-state">
+              <p>Aucune conversation</p>
+              <button class="start-chat-btn" (click)="openNewChat()">Démarrer une conversation</button>
+            </div>
           }
         </div>
       } @else {
@@ -49,13 +68,13 @@
               </div>
             </div>
           } @empty {
-            <p class="empty-state">Aucun message</p>
+            <p class="empty-state">Écrivez votre premier message!</p>
           }
         </div>
       }
     </div>
 
-    @if (selectedConversation()) {
+    @if (canSendMessage) {
       <div class="chat-footer">
         <input
           type="text"

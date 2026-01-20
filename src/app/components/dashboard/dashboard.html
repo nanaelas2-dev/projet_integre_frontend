@@ -2,7 +2,10 @@
   <!-- Header -->
   <header class="header">
     <h1>Mon Tableau de Bord</h1>
-    <button routerLink="/publications/add" class="btn-add">+ Nouvelle Publication</button>
+    <div class="header-actions">
+      <button routerLink="/publications/add" class="btn-add">+ Nouvelle Publication</button>
+      <button (click)="logout()" class="btn-logout">Déconnexion</button>
+    </div>
   </header>
 
   <!-- Content -->
@@ -28,3 +31,6 @@
     }
   </div>
 </div>
+
+<!-- Chat Component -->
+<app-chat />
