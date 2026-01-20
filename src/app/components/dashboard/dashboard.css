@@ -1,43 +1,233 @@
-.dashboard-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+/* Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
 }
-.header {
+
+.nav-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-tabs button {
+  padding: 8px 20px;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.nav-tabs button:hover {
+  background: #f3f4f6;
+}
+
+.nav-tabs button.active {
+  background: #1f2937;
+  color: #fff;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-logout {
+  padding: 8px 16px;
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #6b7280;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-logout:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+/* Main Content */
+.main-content {
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
+  background: #f9fafb;
+}
+
+/* Profile Container */
+.profile-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* Profile Header */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.avatar-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #1f2937;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.profile-email {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 12px 0;
+}
+
+.profile-description {
+  font-size: 0.95rem;
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.profile-description.empty {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Profile Stats */
+.profile-stats {
+  display: flex;
+  gap: 48px;
+  padding: 24px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 32px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Profile Publications */
+.profile-publications {
+  margin-top: 24px;
+}
+
+.section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
-.header-actions {
-  display: flex;
-  gap: 10px;
+
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
 }
+
 .btn-add {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 50px;
+  padding: 8px 16px;
+  background: #1f2937;
+  color: #fff;
   border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
   cursor: pointer;
-  font-size: 1rem;
+  transition: background 0.2s;
 }
-.btn-logout {
-  background-color: #dc3545;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 50px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
+
+.btn-add:hover {
+  background: #374151;
 }
-.btn-logout:hover {
-  background-color: #c82333;
+
+.publications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
+
+.loading {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px;
+}
+
 .empty-state {
   text-align: center;
-  color: #888;
-  margin-top: 50px;
+  color: #9ca3af;
+  padding: 60px 20px;
   font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .navbar {
+    padding: 0 16px;
+  }
+
+  .nav-brand {
+    display: none;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-stats {
+    justify-content: center;
+  }
 }

@@ -29,27 +29,33 @@ export class PublicationCreate {
 
   onSubmit() {
     if (this.pubForm.valid) {
-      // used non-null assertion (!), to mention to type script that i already checked that the user cannot be null
-      // because we check for authentification with the authGuard
-      const currentUser = this.authService.currentUser()!;
+      const currentUser = this.authService.currentUser();
+
+      if (!currentUser) {
+        alert('Erreur: Utilisateur non connecté');
+        return;
+      }
 
       const formValue = this.pubForm.value;
 
       const request: PublicationRequest = {
         utilisatriceId: currentUser.id,
-        description: formValue.description!,
+        description: formValue.description!.trim(),
         categorie: formValue.categorie as Categorie,
-        pieceJointe: formValue.pieceJointe || '',
+        pieceJointe: formValue.pieceJointe?.trim() || '',
       };
 
+      console.log('Sending publication request:', JSON.stringify(request));
+
       this.publicationService.createPublication(request).subscribe({
-        next: () => {
+        next: (response) => {
+          console.log('Publication created:', response);
           alert('Publication ajoutée avec succès !');
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          console.error(err);
-          alert('Erreur lors de la création.');
+          console.error('Error creating publication:', err);
+          alert(`Erreur lors de la création: ${err.status} - ${err.error?.message || err.message || 'Unknown error'}`);
         },
       });
     }

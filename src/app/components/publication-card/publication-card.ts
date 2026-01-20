@@ -1,27 +1,42 @@
-import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { Component, computed, EventEmitter, inject, Input, OnInit, Output, signal } from '@angular/core';
 import { Categorie, Publication, PublicationRequest } from '../../models/publication';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicationService } from '../../services/publicationService';
 import { DatePipe, UpperCasePipe } from '@angular/common';
+import { CommentService } from '../../services/commentService';
+import { Commentaire } from '../../models/comment';
+import { AuthService } from '../../services/authService';
 
 @Component({
   selector: 'app-publication-card',
-  imports: [DatePipe, UpperCasePipe, ReactiveFormsModule],
+  imports: [DatePipe, UpperCasePipe, ReactiveFormsModule, FormsModule],
   templateUrl: './publication-card.html',
   styleUrl: './publication-card.css',
 })
-export class PublicationCard {
+export class PublicationCard implements OnInit {
   // Inputs/Outputs
   @Input({ required: true }) publication!: Publication;
   @Input({ required: true }) userId!: number; // Needed to rebuild DTO
   @Output() deleted = new EventEmitter<number>(); // Notify parent to remove from list
 
   private service = inject(PublicationService);
+  private commentService = inject(CommentService);
+  private authService = inject(AuthService);
   private fb = inject(FormBuilder);
 
   // State
   isEditing = signal(false);
   categories = Object.values(Categorie);
+  
+  // Comments state
+  comments = signal<Commentaire[]>([]);
+  showComments = signal(false);
+  newComment = '';
+  isLoadingComments = signal(false);
+
+  ngOnInit() {
+    this.loadComments();
+  }
 
   // Computed Signal for Ownership
   isOwner = computed(() => {
@@ -91,5 +106,62 @@ export class PublicationCard {
         error: (err) => console.error(err),
       });
     }
+  }
+
+  // Comments methods
+  loadComments() {
+    this.isLoadingComments.set(true);
+    this.commentService.getCommentsByPublication(this.publication.id).subscribe({
+      next: (data) => {
+        this.comments.set(data);
+        this.isLoadingComments.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading comments:', err);
+        this.isLoadingComments.set(false);
+      },
+    });
+  }
+
+  toggleComments() {
+    this.showComments.set(!this.showComments());
+  }
+
+  addComment() {
+    if (!this.newComment.trim()) return;
+
+    const currentUser = this.authService.currentUser();
+    if (!currentUser) return;
+
+    const request = {
+      contenu: this.newComment.trim(),
+      idUtilisateur: currentUser.id,
+      idPublication: this.publication.id,
+    };
+
+    this.commentService.addComment(request).subscribe({
+      next: (comment) => {
+        this.comments.update(prev => [...prev, comment]);
+        this.newComment = '';
+      },
+      error: (err) => console.error('Error adding comment:', err),
+    });
+  }
+
+  deleteComment(commentId: number) {
+    if (confirm('Voulez-vous supprimer ce commentaire ?')) {
+      this.commentService.deleteComment(commentId).subscribe({
+        next: () => {
+          this.comments.update(prev => prev.filter(c => c.id !== commentId));
+        },
+        error: (err) => console.error('Error deleting comment:', err),
+      });
+    }
+  }
+
+  getCommentAuthorInitials(comment: Commentaire): string {
+    const prenom = comment.prenomUtilisateur || 'U';
+    const nom = comment.nomUtilisateur || 'U';
+    return (prenom.charAt(0) + nom.charAt(0)).toUpperCase();
   }
 }

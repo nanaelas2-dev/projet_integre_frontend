@@ -57,4 +57,59 @@
     <button (click)="onDelete()" class="btn-icon delete">Supprimer</button>
   </div>
   }
+
+  <!-- COMMENTS SECTION -->
+  @if (!isEditing()) {
+  <div class="comments-section">
+    <button (click)="toggleComments()" class="btn-toggle-comments">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      {{ comments().length }} {{ comments().length === 1 ? 'commentaire' : 'commentaires' }}
+    </button>
+
+    @if (showComments()) {
+    <div class="comments-container">
+      <!-- Comments List -->
+      @if (comments().length > 0) {
+        <div class="comments-list">
+          @for (comment of comments(); track comment.id) {
+          <div class="comment-item">
+            <div class="comment-avatar">{{ getCommentAuthorInitials(comment) }}</div>
+            <div class="comment-content">
+              <div class="comment-header">
+                <span class="comment-author">{{ comment.prenomUtilisateur }} {{ comment.nomUtilisateur }}</span>
+                <span class="comment-date">{{ comment.dateCreation | date:'dd MMM HH:mm' }}</span>
+              </div>
+              <p class="comment-text">{{ comment.contenu }}</p>
+              @if (comment.idUtilisateur === userId) {
+                <button (click)="deleteComment(comment.id)" class="btn-delete-comment">Supprimer</button>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      } @else {
+        <p class="no-comments">Aucun commentaire pour le moment</p>
+      }
+
+      <!-- Add Comment Form -->
+      <div class="add-comment-form">
+        <input 
+          type="text" 
+          [(ngModel)]="newComment" 
+          placeholder="Ajouter un commentaire..."
+          (keyup.enter)="addComment()"
+        />
+        <button (click)="addComment()" [disabled]="!newComment.trim()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  }
 </div>

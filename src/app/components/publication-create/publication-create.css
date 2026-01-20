@@ -1,54 +1,109 @@
 .container {
   max-width: 600px;
-  margin: 2rem auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  margin: 40px auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
+.container h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 32px 0;
+}
+
 .form-group {
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 24px;
 }
+
 label {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
 }
+
 input,
 select,
 textarea {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
 }
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #1f2937;
+  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+select {
+  background: #fff;
+  cursor: pointer;
+}
+
 .actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 32px;
 }
+
 .btn-submit {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
+  padding: 12px 24px;
+  background: #1f2937;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
+
+.btn-submit:hover {
+  background: #374151;
+}
+
 .btn-submit:disabled {
-  background-color: #ccc;
+  background: #9ca3af;
   cursor: not-allowed;
 }
+
 .btn-cancel {
-  background-color: #6c757d;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
+  padding: 12px 24px;
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #6b7280;
   cursor: pointer;
   text-decoration: none;
+  transition: all 0.2s;
 }
+
+.btn-cancel:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
 .error {
-  color: red;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 6px;
 }
