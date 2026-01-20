@@ -11,7 +11,25 @@ export class PublicationService {
   private apiUrl = 'http://localhost:8080/api/publications';
 
   createPublication(request: PublicationRequest): Observable<Publication> {
-    return this.http.post<Publication>(this.apiUrl, request);
+    // Create the FormData object
+    const formData = new FormData();
+
+    // Append simple fields
+    formData.append('utilisatriceId', request.utilisatriceId.toString());
+    formData.append('description', request.description);
+    formData.append('categorie', request.categorie);
+
+    //  Append the File (if it exists)
+    if (request.fichier) {
+      formData.append('file', request.fichier);
+    }
+
+    // Append the Link (if it exists)
+    if (request.lien) {
+      formData.append('lien', request.lien);
+    }
+
+    return this.http.post<Publication>(this.apiUrl, formData);
   }
 
   // Get All Publications (For the Feed)

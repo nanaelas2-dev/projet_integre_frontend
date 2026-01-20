@@ -52,3 +52,46 @@ textarea {
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
+
+.attachment-section {
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+.tabs button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.tabs button.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+.file-upload-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-select {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.filename {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #555;
+}
