@@ -11,7 +11,25 @@ export class PublicationService {
   private apiUrl = 'http://localhost:8080/api/publications';
 
   createPublication(request: PublicationRequest): Observable<Publication> {
-    return this.http.post<Publication>(this.apiUrl, request);
+    // Create the FormData object
+    const formData = new FormData();
+
+    // Append simple fields
+    formData.append('utilisatriceId', request.utilisatriceId.toString());
+    formData.append('description', request.description);
+    formData.append('categorie', request.categorie);
+
+    //  Append the File (if it exists)
+    if (request.fichier) {
+      formData.append('file', request.fichier);
+    }
+
+    // Append the Link (if it exists)
+    if (request.lien) {
+      formData.append('lien', request.lien);
+    }
+
+    return this.http.post<Publication>(this.apiUrl, formData);
   }
 
   // Get All Publications (For the Feed)
@@ -31,7 +49,26 @@ export class PublicationService {
 
   // Update
   updatePublication(id: number, request: PublicationRequest): Observable<Publication> {
-    return this.http.put<Publication>(`${this.apiUrl}/${id}`, request);
+    const formData = new FormData();
+
+    // We don't usually change the author on edit, but the DTO requires it:
+    formData.append('utilisatriceId', request.utilisatriceId.toString());
+    formData.append('description', request.description);
+    formData.append('categorie', request.categorie);
+
+    // LOGIC:
+    // If 'fichier' is present, the backend should replace the old one.
+    // If 'lien' is present, the backend should update the link.
+    // If BOTH are null, the backend should keep the existing attachment.
+
+    if (request.fichier) {
+      formData.append('file', request.fichier);
+    }
+
+    if (request.lien) {
+      formData.append('lien', request.lien);
+    }
+    return this.http.put<Publication>(`${this.apiUrl}/${id}`, formData);
   }
 
   // Delete

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicationService } from '../../services/publicationService';
 import { Router, RouterLink } from '@angular/router';
@@ -24,8 +24,26 @@ export class PublicationCreate {
   pubForm = this.fb.group({
     categorie: ['', Validators.required],
     description: ['', [Validators.required, Validators.minLength(10)]],
-    pieceJointe: [''],
+    lien: [''],
   });
+
+  // Signals for UI Logic
+  mode = signal<'FILE' | 'LINK'>('FILE'); // Track which tab is open
+  selectedFile = signal<File | null>(null);
+
+  setMode(mode: 'FILE' | 'LINK') {
+    this.mode.set(mode);
+    // Reset data when switching tabs so we don't send both
+    if (mode === 'FILE') this.pubForm.patchValue({ lien: '' });
+    if (mode === 'LINK') this.selectedFile.set(null);
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile.set(file);
+    }
+  }
 
   onSubmit() {
     if (this.pubForm.valid) {
@@ -42,7 +60,8 @@ export class PublicationCreate {
         utilisatriceId: currentUser.id,
         description: formValue.description!.trim(),
         categorie: formValue.categorie as Categorie,
-        pieceJointe: formValue.pieceJointe?.trim() || '',
+        fichier: this.selectedFile(),
+        lien: formValue.lien || null,
       };
 
       console.log('Sending publication request:', JSON.stringify(request));

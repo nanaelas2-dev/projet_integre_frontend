@@ -17,11 +17,20 @@ export interface Publication {
   datePublication?: string;
 
   utilisatrice: Author;
+  type_piece_jointe: TypePieceJointe;
+}
+
+export enum TypePieceJointe {
+  TEXT_LINK = 'TEXT_LINK',
+  IMAGE = 'IMAGE',
+  PDF = 'PDF',
+  VIDEO_LINK = 'VIDEO_LINK'
 }
 
 export interface PublicationRequest {
   utilisatriceId: number;
   description: string;
-  pieceJointe: string;
+  lien: string | null;
   categorie: Categorie;
+  fichier: File | null;
 }
