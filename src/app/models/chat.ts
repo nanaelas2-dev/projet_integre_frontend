@@ -10,7 +10,8 @@ export interface MessageDTO {
   id: number;
   conversationId: number;
   expeditricId: number;
-  expeditricNom: string;
+  expeditriceNom: string;
+  expeditricePrenom: string;
   contenu: string;
   dateEnvoi: string;
   lu: boolean;
@@ -21,7 +22,8 @@ export interface ConversationDTO {
   id: number;
   autreParticipanteId: number;
   autreParticipanteNom: string;
+  autreParticipantePrenom: string;
   dernierMessage: string;
   dernierMessageDate: string;
-  nonLus: number;
+  messagesNonLus: number;
 }
