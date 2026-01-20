@@ -22,29 +22,117 @@
     <p class="description">{{ publication.description }}</p>
 
     @if (publication.pieceJointe) {
-    <a [href]="publication.pieceJointe" target="_blank" class="attachment"> 📎 Pièce jointe </a>
+    <div class="attachment-container">
+      @switch (publication.type_piece_jointe) {
+
+      <!-- CASE 1: IMAGE -->
+      @case (Type.IMAGE) {
+      <img
+        [src]="publication.pieceJointe | safeUrl:'IMAGE'"
+        class="media-image"
+        alt="Publication Image"
+      />
+      }
+
+      <!-- CASE 2: YOUTUBE VIDEO -->
+      @case (Type.VIDEO_LINK) {
+      <div class="video-wrapper">
+        <iframe
+          [src]="publication.pieceJointe | safeUrl:'VIDEO_LINK'"
+          frameborder="0"
+          allowfullscreen
+        >
+        </iframe>
+      </div>
+      }
+
+      <!-- CASE 3: PDF -->
+      @case (Type.PDF) {
+      <a [href]="publication.pieceJointe | safeUrl:'PDF'" target="_blank" class="pdf-link">
+        📄 Voir le document PDF
+      </a>
+      }
+
+      <!-- CASE 4: STANDARD LINK -->
+      @case (Type.TEXT_LINK) {
+      <a [href]="publication.pieceJointe" target="_blank" class="text-link">
+        🔗 {{ publication.pieceJointe }}
+      </a>
+      } }
+    </div>
     } } @else {
     <!-- EDIT FORM -->
     <form [formGroup]="editForm" (ngSubmit)="onSave()">
+      <!-- Category -->
       <div class="form-group">
-        <select formControlName="categorie">
+        <select formControlName="categorie" class="form-control">
           @for (cat of categories; track cat) {
           <option [value]="cat">{{ cat }}</option>
           }
         </select>
       </div>
 
+      <!-- Description -->
       <div class="form-group">
-        <textarea formControlName="description" rows="4"></textarea>
+        <textarea formControlName="description" rows="3" class="form-control"></textarea>
       </div>
 
-      <div class="form-group">
-        <input type="text" formControlName="pieceJointe" placeholder="Lien pièce jointe" />
+      <!-- === EDIT ATTACHMENT SECTION === -->
+      <div class="edit-attachment-section">
+        <label>Modifier la pièce jointe :</label>
+
+        <!-- Tabs -->
+        <div class="edit-tabs">
+          <button
+            type="button"
+            [class.active]="editMode() === 'FILE'"
+            (click)="setEditMode('FILE')"
+          >
+            📷 Fichier
+          </button>
+          <button
+            type="button"
+            [class.active]="editMode() === 'LINK'"
+            (click)="setEditMode('LINK')"
+          >
+            🔗 Lien
+          </button>
+        </div>
+
+        <!-- FILE -->
+        @if (editMode() === 'FILE') {
+        <div class="file-input-wrapper">
+          <!-- Hidden Input -->
+          <input #fileInput type="file" (change)="onFileSelected($event)" style="display: none" />
+
+          <button type="button" class="btn-secondary" (click)="fileInput.click()">
+            {{ newFile() ? '📁 Fichier sélectionné' : '📂 Changer le fichier' }}
+          </button>
+
+          @if (newFile()) {
+          <span class="file-name">{{ newFile()?.name }}</span>
+          } @else {
+          <!-- Helper text to show we are keeping the old one -->
+          <span class="file-name hint"> (Laisser vide pour garder l'actuel) </span>
+          }
+        </div>
+        }
+
+        <!-- LINK -->
+        @if (editMode() === 'LINK') {
+        <input
+          type="text"
+          formControlName="lien"
+          class="form-control"
+          placeholder="Coller le lien YouTube..."
+        />
+        }
       </div>
 
+      <!-- Actions -->
       <div class="edit-actions">
         <button type="button" (click)="toggleEdit()" class="btn-cancel">Annuler</button>
-        <button type="submit" class="btn-save">Sauvegarder</button>
+        <button type="submit" [disabled]="editForm.invalid" class="btn-save">Enregistrer</button>
       </div>
     </form>
     }

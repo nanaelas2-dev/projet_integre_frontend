@@ -1,14 +1,20 @@
 import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
-import { Categorie, Publication, PublicationRequest } from '../../models/publication';
+import {
+  Categorie,
+  Publication,
+  PublicationRequest,
+  TypePieceJointe,
+} from '../../models/publication';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PublicationService } from '../../services/publicationService';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { Commentaire, CreateCommentaireRequest } from '../../models/commentaire';
 import { CommentaireService } from '../../services/commentaireService';
+import { SafeUrlPipe } from '../../pipes/safe-url-pipe';
 
 @Component({
   selector: 'app-publication-card',
-  imports: [DatePipe, UpperCasePipe, ReactiveFormsModule, FormsModule],
+  imports: [DatePipe, UpperCasePipe, ReactiveFormsModule, FormsModule, SafeUrlPipe],
   templateUrl: './publication-card.html',
   styleUrl: './publication-card.css',
 })
@@ -22,9 +28,15 @@ export class PublicationCard {
   private fb = inject(FormBuilder);
   private commentaireService = inject(CommentaireService);
 
+  Type = TypePieceJointe;
+
   // State
   isEditing = signal(false);
   categories = Object.values(Categorie);
+
+  // We need these to track if the user changes the file during edit
+  editMode = signal<'FILE' | 'LINK'>('FILE');
+  newFile = signal<File | null>(null);
 
   // --- NEW COMMENT SIGNALS ---
   // Controls visibility (Is the comment box open or closed?)
@@ -53,7 +65,7 @@ export class PublicationCard {
   editForm = this.fb.group({
     categorie: ['', Validators.required],
     description: ['', [Validators.required, Validators.minLength(10)]],
-    pieceJointe: [''],
+    lien: [''],
   });
 
   // Toggle between View/Edit
@@ -64,8 +76,37 @@ export class PublicationCard {
       this.editForm.patchValue({
         categorie: this.publication.categorie,
         description: this.publication.description,
-        pieceJointe: this.publication.pieceJointe,
       });
+
+      // 2. Determine Initial Mode based on existing type
+      const currentType = this.publication.type_piece_jointe;
+
+      if (currentType === TypePieceJointe.IMAGE || currentType === TypePieceJointe.PDF) {
+        this.editMode.set('FILE');
+        this.newFile.set(null); // Null means "Keep existing file"
+      } else if (
+        currentType === TypePieceJointe.VIDEO_LINK ||
+        currentType === TypePieceJointe.TEXT_LINK
+      ) {
+        this.editMode.set('LINK');
+        // Pre-fill the link input with the current URL
+        this.editForm.patchValue({ lien: this.publication.pieceJointe });
+      }
+    }
+  }
+
+  // Handle switching tabs in Edit Mode
+  setEditMode(mode: 'FILE' | 'LINK') {
+    this.editMode.set(mode);
+    if (mode === 'FILE') this.editForm.patchValue({ lien: '' });
+    if (mode === 'LINK') this.newFile.set(null);
+  }
+
+  // Handle file selection
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.newFile.set(file);
     }
   }
 
@@ -78,7 +119,10 @@ export class PublicationCard {
         utilisatriceId: this.userId, // Keep same user
         description: formVal.description!,
         categorie: formVal.categorie as Categorie,
-        pieceJointe: formVal.pieceJointe || '',
+        // Send File: Only if user picked a NEW one (otherwise null)
+        fichier: this.newFile(),
+        // Send Link: Only if in LINK mode and text is present
+        lien: this.editMode() === 'LINK' ? formVal.lien || null : null
       };
 
       // Call Backend
