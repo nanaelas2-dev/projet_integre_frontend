@@ -4,20 +4,30 @@ import { RouterLink } from '@angular/router';
 import { PublicationCard } from '../publication-card/publication-card';
 import { PublicationService } from '../../services/publicationService';
 import { Publication } from '../../models/publication';
+import { Chat } from '../chat/chat';
+import { Friends } from '../friends/friends';
+import { FriendService } from '../../services/friendService';
+import { FeedComponent } from '../feed/feed';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, PublicationCard],
+  imports: [RouterLink, PublicationCard, Chat, Friends, FeedComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
   private pubService = inject(PublicationService);
   private authService = inject(AuthService);
+  private friendService = inject(FriendService);
 
   // Signals
   publications = signal<Publication[]>([]);
   isLoading = signal(true);
+  activeTab = signal<'profile' | 'feed'>('profile');
+
+  // Expose auth service for template
+  auth = this.authService;
+  friends = this.friendService.friends;
 
   // Helper for template
   currentUserId = 0;
@@ -27,6 +37,7 @@ export class Dashboard implements OnInit {
     if (user && user.id) {
       this.currentUserId = user.id;
       this.loadPublications(user.id);
+      this.friendService.loadFriends();
     }
   }
 
@@ -43,11 +54,16 @@ export class Dashboard implements OnInit {
     });
   }
 
+  setTab(tab: 'profile' | 'feed') {
+    this.activeTab.set(tab);
+  }
+
   // Handle the 'deleted' event from the child card
   removePublication(idToDelete: number) {
-    // Filter the array signal to remove the deleted ID
-    // "Keep every publication where the ID is NOT the one we just deleted"
-    // This avoids the call of the full reload with loadPublications
     this.publications.update((oldList) => oldList.filter((p) => p.id !== idToDelete));
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

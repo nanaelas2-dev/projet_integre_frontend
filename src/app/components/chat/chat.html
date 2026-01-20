@@ -1,6 +1,8 @@
 <!-- Floating Chat Button -->
 <button class="chat-toggle" (click)="toggleChat()">
-  💬
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
   @if (unreadCount() > 0) {
     <span class="badge">{{ unreadCount() }}</span>
   }
@@ -10,32 +12,55 @@
 @if (isOpen()) {
   <div class="chat-panel">
     <div class="chat-header">
-      @if (selectedConversation()) {
+      @if (selectedConversation() || selectedFriend() || showNewChat()) {
         <button class="back-btn" (click)="backToList()">←</button>
-        <span>{{ selectedConversation()?.autreParticipanteNom }}</span>
+        <span>{{ showNewChat() ? 'Nouvelle conversation' : chatTitle }}</span>
       } @else {
         <span>Messages</span>
+        <button class="new-chat-btn" (click)="openNewChat()">+</button>
       }
       <button class="close-btn" (click)="toggleChat()">×</button>
     </div>
 
     <div class="chat-body">
-      @if (!selectedConversation()) {
+      @if (showNewChat()) {
+        <!-- Friends Selection for New Chat -->
+        <div class="friends-select-list">
+          <p class="section-title">Choisir une amie:</p>
+          @for (friend of friends(); track friend.id) {
+            <div class="conversation-item" (click)="selectFriendForChat(friend)">
+              <div class="conv-avatar">{{ friend.prenom.charAt(0) }}</div>
+              <div class="conv-info">
+                <div class="conv-name">{{ friend.prenom }} {{ friend.nom }}</div>
+                <div class="conv-preview">{{ friend.email }}</div>
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-state">
+              Aucune amie.<br>
+              Ajoutez des amies pour pouvoir discuter!
+            </p>
+          }
+        </div>
+      } @else if (!selectedConversation() && !selectedFriend()) {
         <!-- Conversations List -->
         <div class="conversations-list">
           @for (conv of conversations(); track conv.id) {
             <div class="conversation-item" (click)="selectConversation(conv)">
-              <div class="conv-avatar">{{ conv.autreParticipanteNom.charAt(0) }}</div>
+              <div class="conv-avatar">{{ conv.autreParticipantePrenom.charAt(0) || conv.autreParticipanteNom.charAt(0) }}</div>
               <div class="conv-info">
-                <div class="conv-name">{{ conv.autreParticipanteNom }}</div>
+                <div class="conv-name">{{ conv.autreParticipantePrenom }} {{ conv.autreParticipanteNom }}</div>
                 <div class="conv-preview">{{ conv.dernierMessage }}</div>
               </div>
-              @if (conv.nonLus > 0) {
-                <span class="conv-badge">{{ conv.nonLus }}</span>
+              @if (conv.messagesNonLus > 0) {
+                <span class="conv-badge">{{ conv.messagesNonLus }}</span>
               }
             </div>
           } @empty {
-            <p class="empty-state">Aucune conversation</p>
+            <div class="empty-state">
+              <p>Aucune conversation</p>
+              <button class="start-chat-btn" (click)="openNewChat()">Démarrer une conversation</button>
+            </div>
           }
         </div>
       } @else {
@@ -49,13 +74,13 @@
               </div>
             </div>
           } @empty {
-            <p class="empty-state">Aucun message</p>
+            <p class="empty-state">Écrivez votre premier message!</p>
           }
         </div>
       }
     </div>
 
-    @if (selectedConversation()) {
+    @if (canSendMessage) {
       <div class="chat-footer">
         <input
           type="text"

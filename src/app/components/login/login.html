@@ -1,13 +1,26 @@
-<div class="login-box">
-  <h2>Plateforme STEM</h2>
-  <form [formGroup]="loginForm" (ngSubmit)="handleLogin()">
-    <input type="email" formControlName="email" placeholder="Email">
-    <input type="password" formControlName="password" placeholder="Mot de passe">
+<div class="login-container">
+  <div class="login-box">
+    <h2>STEM Connect</h2>
+    <p class="subtitle">Connectez-vous à votre compte</p>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="handleLogin()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" formControlName="email" placeholder="votre@email.com">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" formControlName="password" placeholder="••••••••">
+      </div>
 
-    <button type="submit" [disabled]="loginForm.invalid">
-      Se connecter
-    </button>
-
-  </form>
-  <button (click)="registerRedirect()" class="register-btn">S'inscrire</button>
+      <button type="submit" class="btn-primary" [disabled]="loginForm.invalid">
+        Se connecter
+      </button>
+    </form>
+    
+    <div class="divider">ou</div>
+    
+    <button (click)="registerRedirect()" class="register-btn">Créer un compte</button>
+  </div>
 </div>

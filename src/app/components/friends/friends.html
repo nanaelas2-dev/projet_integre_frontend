@@ -1,0 +1,148 @@
+<!-- Floating Friends Button -->
+<button class="friends-toggle" (click)="togglePanel()">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+  @if (pendingCount > 0) {
+    <span class="badge">{{ pendingCount }}</span>
+  }
+</button>
+
+<!-- Friends Panel -->
+@if (isOpen()) {
+  <div class="friends-panel">
+    <div class="friends-header">
+      <span>Amies</span>
+      <button class="close-btn" (click)="togglePanel()">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        [class.active]="activeTab() === 'friends'" 
+        (click)="setTab('friends')">
+        Mes Amies ({{ friends().length }})
+      </button>
+      <button 
+        [class.active]="activeTab() === 'received'" 
+        (click)="setTab('received')">
+        Reçues
+        @if (receivedRequests().length > 0) {
+          <span class="tab-badge">{{ receivedRequests().length }}</span>
+        }
+      </button>
+      <button 
+        [class.active]="activeTab() === 'sent'" 
+        (click)="setTab('sent')">
+        Envoyées
+      </button>
+      <button 
+        [class.active]="activeTab() === 'search'" 
+        (click)="setTab('search')">
+        🔍
+      </button>
+    </div>
+
+    <!-- Action Message -->
+    @if (actionMessage()) {
+      <div class="action-message" [class.success]="actionMessage()?.type === 'success'" [class.error]="actionMessage()?.type === 'error'">
+        {{ actionMessage()?.text }}
+      </div>
+    }
+
+    <div class="friends-body">
+      <!-- Friends List -->
+      @if (activeTab() === 'friends') {
+        @if (isLoading()) {
+          <p class="loading">Chargement...</p>
+        } @else {
+          @for (friend of friends(); track friend.id) {
+            <div class="friend-item">
+              <div class="avatar">{{ friend.prenom.charAt(0) }}</div>
+              <div class="info">
+                <div class="name">{{ friend.prenom }} {{ friend.nom }}</div>
+                <div class="email">{{ friend.email }}</div>
+              </div>
+              <button class="btn-remove" (click)="removeFriend(friend)" title="Supprimer">×</button>
+            </div>
+          } @empty {
+            <p class="empty-state">Aucune amie pour l'instant.<br>Recherchez des utilisatrices!</p>
+          }
+        }
+      }
+
+      <!-- Received Requests -->
+      @if (activeTab() === 'received') {
+        @for (request of receivedRequests(); track request.id) {
+          <div class="request-item">
+            <div class="avatar">{{ request.expeditricePrenom.charAt(0) }}</div>
+            <div class="info">
+              <div class="name">{{ request.expeditricePrenom }} {{ request.expeditriceNom }}</div>
+              <div class="date">{{ request.dateEnvoi }}</div>
+            </div>
+            <div class="actions">
+              <button class="btn-accept" (click)="acceptRequest(request)">✓</button>
+              <button class="btn-reject" (click)="rejectRequest(request)">×</button>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-state">Aucune demande reçue</p>
+        }
+      }
+
+      <!-- Sent Requests -->
+      @if (activeTab() === 'sent') {
+        @for (request of sentRequests(); track request.id) {
+          <div class="request-item">
+            <div class="avatar">{{ request.destinatairePrenom.charAt(0) }}</div>
+            <div class="info">
+              <div class="name">{{ request.destinatairePrenom }} {{ request.destinataireNom }}</div>
+              <div class="status">En attente...</div>
+            </div>
+            <button class="btn-cancel" (click)="cancelRequest(request)">Annuler</button>
+          </div>
+        } @empty {
+          <p class="empty-state">Aucune demande envoyée</p>
+        }
+      }
+
+      <!-- Search Users -->
+      @if (activeTab() === 'search') {
+        <div class="search-box">
+          <input 
+            type="text" 
+            [ngModel]="searchQuery()" 
+            (ngModelChange)="searchQuery.set($event)"
+            placeholder="Rechercher par nom ou email..."
+          />
+        </div>
+
+        @for (user of searchResults(); track user.id) {
+          <div class="friend-item">
+            <div class="avatar">{{ user.prenom.charAt(0) }}</div>
+            <div class="info">
+              <div class="name">{{ user.prenom }} {{ user.nom }}</div>
+              <div class="email">{{ user.email }}</div>
+            </div>
+            @if (isRequestSent(user.id)) {
+              <span class="status-pending">Envoyée</span>
+            } @else if (isRequestReceived(user.id)) {
+              <span class="status-pending">Reçue</span>
+            } @else {
+              <button class="btn-add" (click)="sendRequest(user.id)">+ Ajouter</button>
+            }
+          </div>
+        } @empty {
+          @if (searchQuery()) {
+            <p class="empty-state">Aucun résultat</p>
+          } @else {
+            <p class="empty-state">Tapez pour rechercher</p>
+          }
+        }
+      }
+    </div>
+  </div>
+}

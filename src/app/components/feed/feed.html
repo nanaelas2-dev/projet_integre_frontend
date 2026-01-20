@@ -1,39 +1,34 @@
-<div class="feed-layout">
-  <!-- LEFT SIDEBAR: Filters (Desktop) -->
-  <aside class="sidebar">
-    <h3>Filtres</h3>
-    <button [class.active]="currentFilter() === 'ALL'" (click)="filter('ALL')">🌍 Tout voir</button>
+<div class="feed-container">
+  <!-- Header -->
+  <div class="feed-header">
+    <h1>Fil d'actualité</h1>
+    <p>Découvrez les dernières publications de la communauté</p>
+  </div>
 
-    <div class="separator"></div>
-
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <button [class.active]="currentFilter() === 'ALL'" (click)="filter('ALL')">Tout</button>
     @for (cat of categories; track cat) {
-    <button [class.active]="currentFilter() === cat" (click)="filter(cat)"># {{ cat }}</button>
+      <button [class.active]="currentFilter() === cat" (click)="filter(cat)">{{ cat }}</button>
     }
-  </aside>
+  </div>
 
-  <!-- MAIN CONTENT: The Feed -->
-  <main class="feed-content">
-    <div class="feed-header">
-      <h2>Fil d'actualité</h2>
-    </div>
-
-    @if (isLoading()) {
+  <!-- Publications -->
+  @if (isLoading()) {
     <div class="loading-spinner">Chargement...</div>
-    } @if (!isLoading() && publications().length === 0) {
+  } @else if (publications().length === 0) {
     <div class="empty-state">
       <p>Aucune publication pour le moment.</p>
     </div>
-    }
-
-    <div class="posts-list">
+  } @else {
+    <div class="publications-list">
       @for (pub of publications(); track pub.id) {
-      <app-publication-card
-        [publication]="pub"
-        [userId]="currentUserId"
-        (deleted)="removePublication($event)"
-      >
-      </app-publication-card>
+        <app-publication-card
+          [publication]="pub"
+          [userId]="currentUserId"
+          (deleted)="removePublication($event)"
+        />
       }
     </div>
-  </main>
+  }
 </div>

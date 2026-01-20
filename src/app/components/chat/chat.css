@@ -1,20 +1,30 @@
 .chat-toggle {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 56px;
-  height: 56px;
+  bottom: 24px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #1f2937;
   border: none;
-  font-size: 24px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }
 
 .chat-toggle:hover {
-  background: #4f46e5;
+  background: #374151;
+  transform: scale(1.05);
+}
+
+.chat-toggle svg {
+  width: 24px;
+  height: 24px;
 }
 
 .chat-toggle .badge {
@@ -51,7 +61,7 @@
   display: flex;
   align-items: center;
   padding: 16px;
-  background: #6366f1;
+  background: #1f2937;
   color: white;
   font-weight: 600;
 }
@@ -100,7 +110,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #1f2937;
   color: white;
   display: flex;
   align-items: center;
@@ -149,7 +159,7 @@
 }
 
 .message.own {
-  background: #6366f1;
+  background: #1f2937;
   color: white;
   align-self: flex-end;
 }
@@ -181,14 +191,15 @@
 }
 
 .chat-footer input:focus {
-  border-color: #6366f1;
+  border-color: #1f2937;
+  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
 }
 
 .send-btn {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #1f2937;
   border: none;
   color: white;
   font-size: 16px;
@@ -196,11 +207,47 @@
 }
 
 .send-btn:hover {
-  background: #4f46e5;
+  background: #374151;
 }
 
 .empty-state {
   text-align: center;
   color: #9ca3af;
   padding: 40px;
+}
+
+.new-chat-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 8px;
+  margin-left: auto;
+}
+
+.start-chat-btn {
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: #1f2937;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.start-chat-btn:hover {
+  background: #374151;
+}
+
+.friends-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-title {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
 }

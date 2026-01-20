@@ -1,0 +1,2174 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    commentstyle=\color{green!50!black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+
+\begin{document}
+
+% Page de garde
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Large Université Internationale de Rabat (UIR)}\\[1cm]
+    {\large Département d'Informatique}\\[2cm]
+    
+    \rule{\linewidth}{0.5mm}\\[0.4cm]
+    {\huge \bfseries Plateforme Collaborative pour Femmes en STEM}\\[0.2cm]
+    {\Large Rapport de Conception et Réalisation}\\[0.4cm]
+    \rule{\linewidth}{0.5mm}\\[2cm]
+    
+    \includegraphics[width=0.3\textwidth]{logo.png}\\[1.5cm]
+    
+    {\large \textbf{Réalisé par :}}\\[0.5cm]
+    \begin{tabular}{c}
+        Akoujan Ali \\
+        Mohamed Reda Khayour \\
+        Hicham Nazih \\
+        Nada El Asri \\
+        Boufous Reda \\
+    \end{tabular}\\[1.5cm]
+    
+    {\large Année Universitaire: 2025-2026}\\[0.5cm]
+    {\large \today}
+    
+    \vfill
+\end{titlepage}
+
+% Table des matières
+\tableofcontents
+\newpage
+
+% Résumé
+\chapter*{Résumé}
+\addcontentsline{toc}{chapter}{Résumé}
+
+Ce rapport présente la conception et la réalisation d'une plateforme collaborative dédiée aux femmes dans les domaines des Sciences, Technologies, Ingénierie et Mathématiques (STEM). L'application vise à créer un espace d'échange, de partage d'expériences et de networking professionnel pour encourager et soutenir les femmes dans ces domaines traditionnellement dominés par les hommes.
+
+La plateforme offre des fonctionnalités complètes incluant la gestion de profils utilisateurs, le partage de publications (formations et réalisations), un système de messagerie instantanée entre membres, et un système de demandes d'amitié. L'administration dispose d'outils de modération et de validation des inscriptions pour assurer la qualité et la sécurité de la communauté.
+
+Le système est développé avec une architecture moderne utilisant Spring Boot pour le backend, MariaDB pour la persistance des données, Angular pour le frontend, et WebSocket pour la messagerie en temps réel.
+
+\chapter{Cahier des Charges}
+
+\section{Contexte du Projet}
+
+\subsection{Problématique}
+Les femmes sont sous-représentées dans les domaines STEM (Science, Technology, Engineering, Mathematics). Cette disparité s'explique par plusieurs facteurs : stéréotypes de genre, manque de modèles féminins, isolement professionnel, et difficultés d'accès aux réseaux professionnels. Il existe un besoin urgent de créer des espaces dédiés où les femmes en STEM peuvent se connecter, partager leurs expériences, et s'entraider.
+
+\subsection{Objectifs du Projet}
+L'objectif principal est de développer une plateforme collaborative permettant aux femmes en STEM de :
+\begin{itemize}
+    \item Créer et gérer leur profil professionnel
+    \item Partager leurs réalisations et formations
+    \item Échanger avec d'autres membres via messagerie instantanée
+    \item Construire un réseau professionnel via un système d'amitié
+    \item Interagir avec les publications (commentaires)
+    \item Bénéficier d'un environnement modéré et sécurisé
+\end{itemize}
+
+\section{Spécifications Fonctionnelles}
+
+\subsection{Acteurs du Système}
+Le système compte trois types d'acteurs principaux :
+
+\begin{itemize}
+    \item \textbf{Visiteur} : Utilisateur non authentifié pouvant uniquement s'inscrire
+    \item \textbf{Inscrite} : Membre validée de la plateforme avec accès complet aux fonctionnalités
+    \item \textbf{Administrateur} : Gestionnaire de la plateforme avec droits de modération
+\end{itemize}
+
+\subsection{Modules Fonctionnels}
+
+\subsubsection{Module d'Inscription et Authentification}
+\begin{itemize}
+    \item Inscription des nouvelles utilisatrices avec validation administrative
+    \item Authentification sécurisée par JWT
+    \item Validation des inscriptions par l'administrateur
+    \item Gestion des statuts (EN\_ATTENTE, APPROUVEE, REFUSEE)
+\end{itemize}
+
+\subsubsection{Module de Gestion de Profil}
+\begin{itemize}
+    \item Consultation du profil personnel
+    \item Modification des informations (nom, prénom, email, téléphone)
+    \item Consultation des profils des autres membres
+    \item Affichage des statistiques personnelles
+\end{itemize}
+
+\subsubsection{Module de Publication}
+\begin{itemize}
+    \item Création de publications avec deux catégories :
+    \begin{itemize}
+        \item FORMATION : partage de formations suivies ou dispensées
+        \item ACHIEVEMENT : partage de réalisations professionnelles
+    \end{itemize}
+    \item Ajout de pièces jointes aux publications
+    \item Modification et suppression des publications personnelles
+    \item Consultation de toutes les publications de la communauté
+    \item Consultation des publications par utilisatrice
+\end{itemize}
+
+\subsubsection{Module d'Interaction avec Publications}
+\begin{itemize}
+    \item Ajout de commentaires sur les publications
+    \item Modification et suppression de ses propres commentaires
+    \item Affichage des commentaires par publication
+    \item Notifications des nouvelles interactions
+\end{itemize}
+
+\subsubsection{Module de Gestion d'Amitié}
+\begin{itemize}
+    \item Envoi de demandes d'amitié
+    \item Réception et consultation des demandes reçues
+    \item Acceptation ou refus des demandes
+    \item Annulation des demandes envoyées
+    \item Suppression d'amies existantes
+    \item Consultation de la liste d'amies
+    \item Vérification du statut d'amitié entre utilisatrices
+\end{itemize}
+
+\subsubsection{Module de Messagerie}
+\begin{itemize}
+    \item Messagerie instantanée en temps réel (WebSocket)
+    \item Envoi de messages uniquement entre amies
+    \item Création automatique de conversations
+    \item Consultation de l'historique des conversations
+    \item Marquage des messages comme lus
+    \item Compteur de messages non lus
+    \item Notifications en temps réel
+\end{itemize}
+
+\subsubsection{Module d'Administration}
+\begin{itemize}
+    \item Consultation de toutes les demandes d'inscription
+    \item Approbation ou rejet des inscriptions
+    \item Modération des publications
+    \item Modération des commentaires
+    \item Gestion des utilisatrices (suspension, suppression)
+\end{itemize}
+
+\section{Spécifications Non Fonctionnelles}
+
+\subsection{Performance}
+\begin{itemize}
+    \item Temps de réponse des requêtes API < 500ms
+    \item Support de messagerie en temps réel sans latence perceptible
+    \item Pagination des listes pour optimiser le chargement
+\end{itemize}
+
+\subsection{Sécurité}
+\begin{itemize}
+    \item Authentification par tokens JWT
+    \item Hachage des mots de passe (BCrypt)
+    \item Validation des entrées utilisateur
+    \item Protection CORS configurée
+    \item Autorisation basée sur les rôles (ROLE\_USER, ROLE\_ADMIN)
+    \item Restriction des messages aux amies uniquement
+\end{itemize}
+
+\subsection{Scalabilité}
+\begin{itemize}
+    \item Architecture modulaire permettant l'évolution
+    \item Base de données relationnelle optimisée
+    \item API RESTful stateless pour faciliter la montée en charge
+\end{itemize}
+
+\subsection{Disponibilité}
+\begin{itemize}
+    \item Gestion des erreurs avec messages explicites
+    \item Logs détaillés pour le debugging
+    \item Transactions ACID pour garantir la cohérence des données
+\end{itemize}
+
+\subsection{Maintenabilité}
+\begin{itemize}
+    \item Code organisé en couches (Repository, Service, Controller)
+    \item Pattern DTO pour la séparation des responsabilités
+    \item Documentation des endpoints API
+    \item Convention de nommage cohérente
+\end{itemize}
+
+\chapter{Conception}
+
+\section{Architecture Globale}
+
+\subsection{Architecture Logicielle}
+Le système adopte une architecture en couches (Layered Architecture) avec séparation claire des responsabilités :
+
+\begin{itemize}
+    \item \textbf{Couche Présentation} : Controllers REST et WebSocket
+    \item \textbf{Couche Métier} : Services contenant la logique applicative
+    \item \textbf{Couche Accès aux Données} : Repositories JPA
+    \item \textbf{Couche Persistance} : Base de données MariaDB
+\end{itemize}
+
+\subsection{Technologies Utilisées}
+
+\subsubsection{Backend}
+\begin{itemize}
+    \item \textbf{Framework} : Spring Boot 4.0.1
+    \item \textbf{Langage} : Java 21
+    \item \textbf{ORM} : Hibernate 7.2.0 / Spring Data JPA
+    \item \textbf{Sécurité} : Spring Security avec JWT
+    \item \textbf{Messagerie temps réel} : WebSocket avec STOMP
+    \item \textbf{Build} : Maven
+\end{itemize}
+
+\subsubsection{Frontend}
+\begin{itemize}
+    \item \textbf{Framework} : Angular 21.1.0
+    \item \textbf{Langage} : TypeScript 5.9.2
+    \item \textbf{Gestion d'état} : Angular Signals
+    \item \textbf{Client HTTP} : HttpClient avec Interceptors
+    \item \textbf{WebSocket} : @stomp/stompjs + sockjs-client
+    \item \textbf{Build} : Angular CLI
+\end{itemize}
+
+\subsubsection{Base de Données}
+\begin{itemize}
+    \item \textbf{SGBD} : MariaDB 12.1.2
+    \item \textbf{Driver} : MariaDB Connector/J
+\end{itemize}
+
+\subsubsection{Outils de Développement}
+\begin{itemize}
+    \item \textbf{Gestion de version} : Git
+    \item \textbf{IDE} : Visual Studio Code
+    \item \textbf{Génération de code} : Lombok
+\end{itemize}
+
+\section{Diagrammes de Cas d'Utilisation}
+
+\subsection{Use Case Général}
+Ce diagramme présente une vue d'ensemble des fonctionnalités principales de la plateforme et des interactions entre les différents acteurs.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{use_case_general.png}
+    \caption{Diagramme de cas d'utilisation général}
+    \label{fig:usecase_general}
+\end{figure}
+
+\subsection{Use Case Inscription}
+Détaille le processus d'inscription d'une nouvelle utilisatrice et la validation par l'administrateur.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{use_case_inscription.png}
+    \caption{Diagramme de cas d'utilisation - Inscription}
+    \label{fig:usecase_inscription}
+\end{figure}
+
+\subsection{Use Case Consultation et Modification de Profil}
+Représente les interactions liées à la gestion du profil utilisateur.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{use_case_profile.png}
+    \caption{Diagramme de cas d'utilisation - Gestion de profil}
+    \label{fig:usecase_profile}
+\end{figure}
+
+\subsection{Use Case Publication}
+Montre les fonctionnalités de création, modification et consultation des publications.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{use_case_publication.png}
+    \caption{Diagramme de cas d'utilisation - Publication}
+    \label{fig:usecase_publication}
+\end{figure}
+
+\subsection{Use Case Messagerie}
+Illustre le système de messagerie instantanée entre amies.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{use_case_message.png}
+    \caption{Diagramme de cas d'utilisation - Messagerie}
+    \label{fig:usecase_message}
+\end{figure}
+
+\subsection{Use Case Interaction avec Publication}
+Détaille les interactions possibles avec les publications (commentaires, etc.).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{use_case_interaction.png}
+    \caption{Diagramme de cas d'utilisation - Interaction avec publications}
+    \label{fig:usecase_interaction}
+\end{figure}
+
+\subsection{Use Case Modération}
+Présente les fonctionnalités d'administration et de modération.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{use_case_moderation.png}
+    \caption{Diagramme de cas d'utilisation - Modération}
+    \label{fig:usecase_moderation}
+\end{figure}
+
+\section{Diagramme de Classes}
+
+Le diagramme de classes présente la structure complète du modèle de données avec toutes les entités et leurs relations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{diagramme_classe.png}
+    \caption{Diagramme de classes}
+    \label{fig:class_diagram}
+\end{figure}
+
+\subsection{Description des Entités Principales}
+
+\subsubsection{Utilisateur (Classe Abstraite)}
+\begin{itemize}
+    \item \textbf{Attributs} : idUtilisateur, nom, prenom, email, telephone, password, role
+    \item \textbf{Rôle} : Classe mère pour Inscrite et Administrateur
+    \item \textbf{Type d'héritage} : JOINED
+\end{itemize}
+
+\subsubsection{Inscrite}
+\begin{itemize}
+    \item \textbf{Hérite de} : Utilisateur
+    \item \textbf{Attributs spécifiques} : statutInscription (EN\_ATTENTE, APPROUVEE, REFUSEE)
+    \item \textbf{Relations} :
+    \begin{itemize}
+        \item OneToMany avec Publication
+        \item OneToMany avec FriendRequest (demandes envoyées)
+        \item OneToMany avec FriendRequest (demandes reçues)
+        \item ManyToMany avec Conversation (participations)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Administrateur}
+\begin{itemize}
+    \item \textbf{Hérite de} : Utilisateur
+    \item \textbf{Rôle} : ROLE\_ADMIN
+    \item \textbf{Fonctionnalités} : Validation inscriptions, modération
+\end{itemize}
+
+\subsubsection{Publication}
+\begin{itemize}
+    \item \textbf{Attributs} : idPublication, description, pieceJointe, categorie, datePublication
+    \item \textbf{Enum Categorie} : FORMATION, ACHIEVEMENT
+    \item \textbf{Relations} :
+    \begin{itemize}
+        \item ManyToOne avec Inscrite (utilisatrice)
+        \item OneToMany avec Commentaire
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Commentaire}
+\begin{itemize}
+    \item \textbf{Attributs} : idCommentaire, contenu, createdAt
+    \item \textbf{Relations} :
+    \begin{itemize}
+        \item ManyToOne avec Publication
+        \item ManyToOne avec Utilisateur (auteur)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{FriendRequest}
+\begin{itemize}
+    \item \textbf{Attributs} : idDemande, dateEnvoi, dateReponse, statut
+    \item \textbf{Enum StatutDemande} : EN\_ATTENTE, ACCEPTEE, REFUSEE
+    \item \textbf{Relations} :
+    \begin{itemize}
+        \item ManyToOne avec Inscrite (expeditrice)
+        \item ManyToOne avec Inscrite (destinataire)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Conversation}
+\begin{itemize}
+    \item \textbf{Attributs} : idConversation, dernierMessageDate
+    \item \textbf{Relations} :
+    \begin{itemize}
+        \item ManyToOne avec Inscrite (participante1)
+        \item ManyToOne avec Inscrite (participante2)
+        \item OneToMany avec Message
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Message}
+\begin{itemize}
+    \item \textbf{Attributs} : idMessage, contenu, dateEnvoi, lu
+    \item \textbf{Relations} :
+    \begin{itemize}
+        \item ManyToOne avec Conversation
+        \item ManyToOne avec Inscrite (expeditrice)
+    \end{itemize}
+\end{itemize}
+
+\section{Diagrammes de Séquence}
+
+\subsection{Messagerie et Gestion d'Amitié}
+Ce diagramme illustre le processus complet d'envoi d'une demande d'amitié, son acceptation, et l'établissement d'une conversation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{sequence_messaging_friends.png}
+    \caption{Diagramme de séquence - Messagerie et gestion d'amitié}
+    \label{fig:sequence_messaging}
+\end{figure}
+
+\textbf{Scénario détaillé :}
+\begin{enumerate}
+    \item L'utilisatrice A envoie une demande d'amitié à l'utilisatrice B
+    \item Le système crée une FriendRequest avec statut EN\_ATTENTE
+    \item L'utilisatrice B consulte ses demandes reçues
+    \item L'utilisatrice B accepte la demande
+    \item Le système met à jour le statut à ACCEPTEE
+    \item L'utilisatrice A peut maintenant envoyer un message à B
+    \item Le système vérifie que A et B sont amies
+    \item Une Conversation est créée ou récupérée
+    \item Le Message est créé et persisté
+    \item Le message est diffusé en temps réel via WebSocket
+\end{enumerate}
+
+\subsection{Gestion des Publications}
+Représente le cycle de vie complet d'une publication, de sa création à l'interaction par commentaires.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{sequence_publication.png}
+    \caption{Diagramme de séquence - Publication}
+    \label{fig:sequence_publication}
+\end{figure}
+
+\textbf{Scénario détaillé :}
+\begin{enumerate}
+    \item L'inscrite crée une nouvelle publication
+    \item Le système valide les données (description, catégorie)
+    \item La publication est persistée avec datePublication auto-générée
+    \item D'autres utilisatrices consultent les publications
+    \item Le système retourne les publications paginées
+    \item Une utilisatrice ajoute un commentaire
+    \item Le système vérifie l'existence de la publication
+    \item Le commentaire est créé et lié à la publication et son auteur
+    \item Les commentaires sont récupérés triés par date
+\end{enumerate}
+
+\section{Modèle de Données}
+
+\subsection{Tables Principales}
+
+\subsubsection{Table utilisateur}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} \\
+\hline
+id\_utilisateur & BIGINT & PRIMARY KEY, AUTO\_INCREMENT \\
+nom & VARCHAR(255) & NOT NULL \\
+prenom & VARCHAR(255) & NOT NULL \\
+email & VARCHAR(255) & NOT NULL, UNIQUE \\
+telephone & VARCHAR(20) & \\
+password & VARCHAR(255) & NOT NULL \\
+role & VARCHAR(50) & NOT NULL \\
+dtype & VARCHAR(31) & NOT NULL \\
+\hline
+\end{tabular}
+\caption{Structure de la table utilisateur}
+\end{table}
+
+\subsubsection{Table inscrite}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} \\
+\hline
+id\_utilisateur & BIGINT & PRIMARY KEY, FOREIGN KEY \\
+statut\_inscription & VARCHAR(20) & NOT NULL \\
+\hline
+\end{tabular}
+\caption{Structure de la table inscrite}
+\end{table}
+
+\subsubsection{Table publication}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} \\
+\hline
+id\_publication & BIGINT & PRIMARY KEY, AUTO\_INCREMENT \\
+description & TEXT & NOT NULL \\
+piece\_jointe & VARCHAR(500) & \\
+categorie & VARCHAR(20) & NOT NULL \\
+date\_publication & TIMESTAMP & NOT NULL \\
+utilisatrice\_id & BIGINT & FOREIGN KEY \\
+\hline
+\end{tabular}
+\caption{Structure de la table publication}
+\end{table}
+
+\subsubsection{Table friend\_request}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} \\
+\hline
+id\_demande & BIGINT & PRIMARY KEY, AUTO\_INCREMENT \\
+expeditrice\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+destinataire\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+date\_envoi & TIMESTAMP & NOT NULL \\
+date\_reponse & TIMESTAMP & \\
+statut & VARCHAR(20) & NOT NULL \\
+\hline
+\end{tabular}
+\caption{Structure de la table friend\_request}
+\end{table}
+
+\subsubsection{Table conversation}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} \\
+\hline
+id\_conversation & BIGINT & PRIMARY KEY, AUTO\_INCREMENT \\
+participante1\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+participante2\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+dernier\_message\_date & TIMESTAMP & \\
+\hline
+\end{tabular}
+\caption{Structure de la table conversation}
+\end{table}
+
+\subsubsection{Table message}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} \\
+\hline
+id\_message & BIGINT & PRIMARY KEY, AUTO\_INCREMENT \\
+conversation\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+expeditrice\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+contenu & TEXT & NOT NULL \\
+date\_envoi & TIMESTAMP & NOT NULL \\
+lu & BOOLEAN & DEFAULT FALSE \\
+\hline
+\end{tabular}
+\caption{Structure de la table message}
+\end{table}
+
+\subsubsection{Table commentaire}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Colonne} & \textbf{Type} & \textbf{Contraintes} \\
+\hline
+id\_commentaire & BIGINT & PRIMARY KEY, AUTO\_INCREMENT \\
+publication\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+auteur\_id & BIGINT & FOREIGN KEY, NOT NULL \\
+contenu & TEXT & NOT NULL \\
+created\_at & TIMESTAMP & NOT NULL \\
+\hline
+\end{tabular}
+\caption{Structure de la table commentaire}
+\end{table}
+
+\chapter{Réalisation Backend}
+
+\section{Architecture Technique Backend}
+
+\subsection{Organisation du Code}
+
+Le code source est organisé selon une architecture en couches avec le pattern MVC (Model-View-Controller) adapté aux API REST :
+
+\begin{lstlisting}[language=bash, caption=Structure du projet]
+src/main/java/ma/uir/femmes_stem/
+├── controller/          # Couche présentation (REST API)
+│   ├── AuthController.java
+│   ├── UtilisateurController.java
+│   ├── AdministrateurController.java
+│   ├── PublicationController.java
+│   ├── CommentaireController.java
+│   ├── MessageController.java
+│   └── FriendRequestController.java
+├── service/            # Couche métier
+│   ├── UtilisateurService.java
+│   ├── CommentaireService.java
+│   ├── MessageService.java
+│   └── FriendRequestService.java
+├── repository/         # Couche accès données
+│   ├── UtilisateurRepository.java
+│   ├── InscriteRepository.java
+│   ├── PublicationRepository.java
+│   ├── CommentaireRepository.java
+│   ├── MessageRepository.java
+│   ├── ConversationRepository.java
+│   └── FriendRequestRepository.java
+├── model/             # Entités JPA
+│   ├── Utilisateur.java
+│   ├── Inscrite.java
+│   ├── Administrateur.java
+│   ├── Publication.java
+│   ├── Commentaire.java
+│   ├── Message.java
+│   ├── Conversation.java
+│   └── FriendRequest.java
+├── security/          # Configuration sécurité
+│   └── SecurityConfig.java
+└── init/             # Initialisation données
+    └── DataInitializer.java
+\end{lstlisting}
+
+\subsection{Configuration de la Base de Données}
+
+La connexion à la base de données est configurée dans \texttt{application.properties} :
+
+\begin{lstlisting}[caption=Configuration MariaDB]
+spring.datasource.url=jdbc:mariadb://localhost:3306/femmes_stem_db
+spring.datasource.username=root
+spring.datasource.password=
+spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MariaDBDialect
+\end{lstlisting}
+
+\subsection{Configuration WebSocket}
+
+La messagerie en temps réel utilise WebSocket avec le protocole STOMP :
+
+\begin{lstlisting}[language=Java, caption=Configuration WebSocket]
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes("/app");
+    }
+    
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:4200")
+                .withSockJS();
+    }
+}
+\end{lstlisting}
+
+\section{API REST - Documentation des Endpoints}
+
+\subsection{Module Authentification}
+
+\subsubsection{POST /api/auth/register}
+\textbf{Description :} Inscription d'une nouvelle utilisatrice
+
+\textbf{Requête :}
+\begin{lstlisting}[language=json]
+{
+    "nom": "Dupont",
+    "prenom": "Marie",
+    "email": "marie.dupont@example.com",
+    "telephone": "0612345678",
+    "password": "securePassword123"
+}
+\end{lstlisting}
+
+\textbf{Réponse (201 Created) :}
+\begin{lstlisting}[language=json]
+{
+    "message": "Inscription en attente d'approbation"
+}
+\end{lstlisting}
+
+\subsubsection{POST /api/auth/login}
+\textbf{Description :} Connexion d'une utilisatrice
+
+\textbf{Requête :}
+\begin{lstlisting}[language=json]
+{
+    "email": "marie.dupont@example.com",
+    "password": "securePassword123"
+}
+\end{lstlisting}
+
+\textbf{Réponse (200 OK) :}
+\begin{lstlisting}[language=json]
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "role": "ROLE_USER"
+}
+\end{lstlisting}
+
+\subsection{Module Gestion de Profil}
+
+\subsubsection{GET /api/utilisateurs/me}
+\textbf{Description :} Récupérer le profil de l'utilisatrice connectée
+
+\textbf{Headers :} Authorization: Bearer \{token\}
+
+\textbf{Réponse (200 OK) :}
+\begin{lstlisting}[language=json]
+{
+    "idUtilisateur": 1,
+    "nom": "Dupont",
+    "prenom": "Marie",
+    "email": "marie.dupont@example.com",
+    "telephone": "0612345678",
+    "role": "ROLE_USER"
+}
+\end{lstlisting}
+
+\subsubsection{PUT /api/utilisateurs/\{id\}}
+\textbf{Description :} Modifier le profil utilisateur
+
+\textbf{Requête :}
+\begin{lstlisting}[language=json]
+{
+    "nom": "Dupont",
+    "prenom": "Marie-Claire",
+    "telephone": "0698765432"
+}
+\end{lstlisting}
+
+\textbf{Réponse (200 OK) :} Profil mis à jour retourné
+
+\subsubsection{GET /api/utilisateurs/\{id\}}
+\textbf{Description :} Consulter le profil d'une autre utilisatrice
+
+\textbf{Réponse (200 OK) :} Données du profil public
+
+\subsection{Module Publication}
+
+\subsubsection{POST /api/publications}
+\textbf{Description :} Créer une nouvelle publication
+
+\textbf{Requête :}
+\begin{lstlisting}[language=json]
+{
+    "description": "J'ai obtenu ma certification en Machine Learning !",
+    "pieceJointe": "https://example.com/certificate.pdf",
+    "categorie": "ACHIEVEMENT",
+    "utilisatriceId": 1
+}
+\end{lstlisting}
+
+\textbf{Réponse (201 Created) :}
+\begin{lstlisting}[language=json]
+{
+    "idPublication": 15,
+    "description": "J'ai obtenu ma certification en ML !",
+    "pieceJointe": "https://example.com/certificate.pdf",
+    "categorie": "ACHIEVEMENT",
+    "datePublication": "2026-01-20T14:30:00",
+    "utilisatriceId": 1,
+    "utilisatriceNom": "Dupont",
+    "utilisatricePrenom": "Marie"
+}
+\end{lstlisting}
+
+\subsubsection{GET /api/publications}
+\textbf{Description :} Récupérer toutes les publications
+
+\textbf{Réponse (200 OK) :} Liste des publications triées par date
+
+\subsubsection{GET /api/publications/utilisatrice/\{id\}}
+\textbf{Description :} Récupérer les publications d'une utilisatrice
+
+\textbf{Réponse (200 OK) :} Liste des publications de l'utilisatrice
+
+\subsubsection{PUT /api/publications/\{id\}}
+\textbf{Description :} Modifier une publication
+
+\textbf{Requête :}
+\begin{lstlisting}[language=json]
+{
+    "description": "Description mise à jour",
+    "pieceJointe": "https://example.com/new.pdf",
+    "categorie": "FORMATION"
+}
+\end{lstlisting}
+
+\subsubsection{DELETE /api/publications/\{id\}}
+\textbf{Description :} Supprimer une publication
+
+\textbf{Réponse (204 No Content)}
+
+\subsection{Module Commentaires}
+
+\subsubsection{POST /api/commentaires}
+\textbf{Description :} Ajouter un commentaire à une publication
+
+\textbf{Requête :}
+\begin{lstlisting}[language=json]
+{
+    "publicationId": 15,
+    "auteurId": 2,
+    "contenu": "Félicitations pour cette réalisation !"
+}
+\end{lstlisting}
+
+\textbf{Réponse (201 Created) :}
+\begin{lstlisting}[language=json]
+{
+    "idCommentaire": 42,
+    "contenu": "Félicitations pour cette réalisation !",
+    "createdAt": "2026-01-20T15:00:00",
+    "auteurId": 2,
+    "auteurNom": "Martin",
+    "auteurPrenom": "Sophie",
+    "publicationId": 15
+}
+\end{lstlisting}
+
+\subsubsection{GET /api/commentaires/publication/\{publicationId\}}
+\textbf{Description :} Récupérer tous les commentaires d'une publication
+
+\textbf{Réponse (200 OK) :} Liste des commentaires triés par date
+
+\subsubsection{PUT /api/commentaires/\{id\}}
+\textbf{Description :} Modifier un commentaire
+
+\subsubsection{DELETE /api/commentaires/\{id\}}
+\textbf{Description :} Supprimer un commentaire
+
+\subsection{Module Gestion d'Amitié}
+
+\subsubsection{POST /api/amies/demande/\{expeditricId\}/\{destinataireId\}}
+\textbf{Description :} Envoyer une demande d'amitié
+
+\textbf{Réponse (201 Created) :}
+\begin{lstlisting}[language=json]
+{
+    "id": 8,
+    "expeditriceId": 1,
+    "expeditriceNom": "Dupont",
+    "expeditricePrenom": "Marie",
+    "destinataireId": 3,
+    "destinataireNom": "Bernard",
+    "destinatairePrenom": "Claire",
+    "dateEnvoi": "2026-01-20T16:00:00",
+    "statut": "EN_ATTENTE"
+}
+\end{lstlisting}
+
+\subsubsection{PUT /api/amies/accepter/\{requestId\}/\{userId\}}
+\textbf{Description :} Accepter une demande d'amitié
+
+\textbf{Réponse (200 OK) :} Demande avec statut ACCEPTEE
+
+\subsubsection{PUT /api/amies/refuser/\{requestId\}/\{userId\}}
+\textbf{Description :} Refuser une demande d'amitié
+
+\textbf{Réponse (200 OK) :} Demande avec statut REFUSEE
+
+\subsubsection{DELETE /api/amies/annuler/\{requestId\}/\{userId\}}
+\textbf{Description :} Annuler une demande envoyée en attente
+
+\textbf{Réponse (204 No Content)}
+
+\subsubsection{DELETE /api/amies/supprimer/\{userId\}/\{amieId\}}
+\textbf{Description :} Supprimer une amie
+
+\textbf{Réponse (204 No Content)}
+
+\subsubsection{GET /api/amies/demandes/recues/\{utilisatriceId\}}
+\textbf{Description :} Récupérer les demandes reçues
+
+\textbf{Réponse (200 OK) :} Liste des demandes reçues
+
+\subsubsection{GET /api/amies/demandes/envoyees/\{utilisatriceId\}}
+\textbf{Description :} Récupérer les demandes envoyées
+
+\textbf{Réponse (200 OK) :} Liste des demandes envoyées
+
+\subsubsection{GET /api/amies/\{utilisatriceId\}}
+\textbf{Description :} Récupérer la liste des amies
+
+\textbf{Réponse (200 OK) :}
+\begin{lstlisting}[language=json]
+[
+    {
+        "id": 3,
+        "nom": "Bernard",
+        "prenom": "Claire",
+        "email": "claire.bernard@example.com"
+    }
+]
+\end{lstlisting}
+
+\subsubsection{GET /api/amies/check/\{userId1\}/\{userId2\}}
+\textbf{Description :} Vérifier si deux utilisatrices sont amies
+
+\textbf{Réponse (200 OK) :}
+\begin{lstlisting}[language=json]
+true
+\end{lstlisting}
+
+\subsection{Module Messagerie}
+
+\subsubsection{POST /api/messages/envoyer}
+\textbf{Description :} Envoyer un message à une amie
+
+\textbf{Requête :}
+\begin{lstlisting}[language=json]
+{
+    "expeditricId": 1,
+    "destinataireId": 3,
+    "contenu": "Bonjour ! Comment vas-tu ?"
+}
+\end{lstlisting}
+
+\textbf{Réponse (201 Created) :}
+\begin{lstlisting}[language=json]
+{
+    "id": 25,
+    "conversationId": 5,
+    "expeditricId": 1,
+    "expeditriceNom": "Dupont",
+    "expeditricePrenom": "Marie",
+    "contenu": "Bonjour ! Comment vas-tu ?",
+    "dateEnvoi": "2026-01-20T17:00:00",
+    "lu": false
+}
+\end{lstlisting}
+
+\textbf{Erreur possible (403 Forbidden) :}
+\begin{lstlisting}[language=json]
+{
+    "error": "Vous ne pouvez envoyer des messages qu'à vos amies"
+}
+\end{lstlisting}
+
+\subsubsection{GET /api/messages/conversation/\{conversationId\}}
+\textbf{Description :} Récupérer l'historique d'une conversation
+
+\textbf{Réponse (200 OK) :} Liste des messages de la conversation
+
+\subsubsection{GET /api/messages/conversations/\{utilisatriceId\}}
+\textbf{Description :} Récupérer toutes les conversations d'une utilisatrice
+
+\textbf{Réponse (200 OK) :}
+\begin{lstlisting}[language=json]
+[
+    {
+        "id": 5,
+        "autreParticipanteId": 3,
+        "autreParticipanteNom": "Bernard",
+        "autreParticipantePrenom": "Claire",
+        "dernierMessage": "Bonjour ! Comment vas-tu ?",
+        "dernierMessageDate": "2026-01-20T17:00:00",
+        "messagesNonLus": 2
+    }
+]
+\end{lstlisting}
+
+\subsubsection{PUT /api/messages/lu/\{conversationId\}/\{userId\}}
+\textbf{Description :} Marquer les messages comme lus
+
+\textbf{Réponse (200 OK) :} Messages mis à jour
+
+\subsubsection{GET /api/messages/non-lus/\{utilisatriceId\}}
+\textbf{Description :} Compter les messages non lus
+
+\textbf{Réponse (200 OK) :}
+\begin{lstlisting}[language=json]
+5
+\end{lstlisting}
+
+\subsubsection{WebSocket - /app/chat.send}
+\textbf{Description :} Envoyer un message en temps réel via WebSocket
+
+\textbf{Connexion :} ws://localhost:8080/ws
+
+\textbf{Message STOMP :}
+\begin{lstlisting}[language=json]
+SEND
+destination:/app/chat.send
+content-type:application/json
+
+{
+    "expeditricId": 1,
+    "destinataireId": 3,
+    "contenu": "Message temps réel"
+}
+\end{lstlisting}
+
+\textbf{Souscription :} /topic/user.\{userId\}
+
+\subsection{Module Administration}
+
+\subsubsection{GET /api/admin/pending}
+\textbf{Description :} Récupérer toutes les demandes d'inscription en attente
+
+\textbf{Réponse (200 OK) :} Liste des inscrites avec statut EN\_ATTENTE
+
+\subsubsection{PUT /api/admin/approve/\{id\}}
+\textbf{Description :} Approuver une inscription
+
+\textbf{Réponse (200 OK) :} Inscrite avec statutInscription = APPROUVEE
+
+\subsubsection{DELETE /api/admin/reject/\{id\}}
+\textbf{Description :} Refuser et supprimer une inscription
+
+\textbf{Réponse (204 No Content)}
+
+\section{Sécurité}
+
+\subsection{Protection des Données}
+
+\begin{itemize}
+    \item \textbf{Hachage des mots de passe} : BCryptPasswordEncoder
+    \item \textbf{Validation des entrées} : Annotations JPA (@NotNull, @Email, etc.)
+    \item \textbf{Protection CSRF} : Désactivée pour API REST
+    \item \textbf{CORS configuré} : Origine autorisée pour le frontend Angular
+\end{itemize}
+
+\subsection{Autorisation}
+
+\begin{itemize}
+    \item \textbf{Authentification requise} : Tous les endpoints sauf /api/auth/**
+    \item \textbf{Rôles utilisateur} : ROLE\_USER (Inscrite), ROLE\_ADMIN (Administrateur)
+    \item \textbf{Vérification amitié} : Messages limités aux amies uniquement
+    \item \textbf{Propriété des ressources} : Modification/suppression limitée au créateur
+\end{itemize}
+
+\chapter{Réalisation Frontend}
+
+\section{Architecture Technique Frontend}
+
+\subsection{Technologies Utilisées}
+
+Le frontend est développé avec les technologies modernes suivantes :
+
+\begin{itemize}
+    \item \textbf{Angular 21.1.0} : Framework SPA (Single Page Application)
+    \item \textbf{TypeScript 5.9.2} : Langage de programmation typé
+    \item \textbf{Angular Signals} : Gestion d'état réactive
+    \item \textbf{Standalone Components} : Architecture modulaire sans NgModules
+    \item \textbf{@stomp/stompjs + sockjs-client} : Communication WebSocket temps réel
+    \item \textbf{RxJS} : Programmation réactive pour les requêtes HTTP
+\end{itemize}
+
+\subsection{Organisation du Code}
+
+Le code frontend suit une architecture modulaire organisée par fonctionnalité :
+
+\begin{lstlisting}[language=bash, caption=Structure du projet Angular]
+src/
+├── index.html              # Point d'entrée HTML
+├── main.ts                 # Bootstrap de l'application
+├── styles.css              # Styles globaux
+└── app/
+    ├── app.ts              # Composant racine
+    ├── app.html            # Template racine (router-outlet)
+    ├── app.config.ts       # Configuration de l'application
+    ├── app.routes.ts       # Configuration du routage
+    ├── components/         # Composants de l'interface
+    │   ├── login/          # Page de connexion
+    │   ├── inscription/    # Page d'inscription
+    │   ├── dashboard/      # Tableau de bord utilisateur
+    │   ├── admin-dashboard/ # Tableau de bord admin
+    │   ├── feed/           # Fil d'actualités
+    │   ├── publication-card/ # Carte de publication
+    │   ├── publication-create/ # Création de publication
+    │   ├── chat/           # Composant de messagerie
+    │   └── friends/        # Gestion des amies
+    ├── services/           # Services métier
+    │   ├── authService.ts  # Authentification
+    │   ├── usersService.ts # Gestion utilisateurs
+    │   ├── publicationService.ts # Publications
+    │   ├── chatService.ts  # Messagerie WebSocket
+    │   └── friendService.ts # Gestion amies
+    ├── models/             # Interfaces TypeScript
+    │   ├── user.ts         # Modèle utilisateur
+    │   ├── publication.ts  # Modèle publication
+    │   ├── chat.ts         # Modèles messagerie
+    │   └── friend.ts       # Modèles amitié
+    ├── guards/             # Guards de navigation
+    │   ├── authGuard.ts    # Protection routes authentifiées
+    │   ├── adminGuard.ts   # Protection routes admin
+    │   └── guestGuard.ts   # Protection routes publiques
+    ├── interceptors/       # Intercepteurs HTTP
+    │   └── authInterceptor.ts # Injection token auth
+    └── environments/       # Configuration environnement
+        └── environment.ts  # Variables d'environnement
+\end{lstlisting}
+
+\section{Configuration de l'Application}
+
+\subsection{Configuration Principale}
+
+Le fichier \texttt{app.config.ts} configure les providers essentiels :
+
+\begin{lstlisting}[language=JavaScript, caption=Configuration Angular]
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './interceptors/authInterceptor';
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([authInterceptor])),
+  ],
+};
+\end{lstlisting}
+
+\subsection{Configuration du Routage}
+
+Le fichier \texttt{app.routes.ts} définit la navigation de l'application :
+
+\begin{lstlisting}[language=JavaScript, caption=Routes de l'application]
+export const routes: Routes = [
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
+  // Zone Publique
+  { path: 'login', component: Login, canActivate: [guestGuard] },
+  { path: 'inscription', component: Inscription, canActivate: [guestGuard] },
+
+  // Zone Membres
+  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
+  { path: 'publications/add', component: PublicationCreate, 
+    canActivate: [authGuard] },
+  { path: 'feed', component: FeedComponent, canActivate: [authGuard] },
+  { path: 'chat', component: Chat, canActivate: [authGuard] },
+
+  // Zone Administration
+  { path: 'admin', component: AdminDashboard, 
+    canActivate: [authGuard, adminGuard] },
+];
+\end{lstlisting}
+
+\subsection{Configuration WebSocket (SockJS)}
+
+Pour permettre la communication WebSocket avec SockJS, un polyfill est ajouté dans \texttt{index.html} :
+
+\begin{lstlisting}[language=HTML, caption=Polyfill SockJS dans index.html]
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FemmesStemFrontend</title>
+  <base href="/">
+  <script>
+    // Polyfill pour SockJS - attend les globaux Node.js
+    var global = window;
+  </script>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+\end{lstlisting}
+
+\section{Services Frontend}
+
+\subsection{Service d'Authentification (AuthService)}
+
+Le service gère l'authentification avec des Signals Angular pour la réactivité :
+
+\begin{lstlisting}[language=JavaScript, caption=AuthService avec Signals]
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private http = inject(HttpClient);
+  private router = inject(Router);
+
+  // Signals pour l'état réactif
+  currentUser = signal<User | null>(null);
+  isAuthenticated = signal<boolean>(false);
+
+  constructor() {
+    this.restoreSession(); // Restaurer session au démarrage
+  }
+
+  login(credentials: any) {
+    const basicAuth = 'Basic ' + btoa(credentials.email + ':' 
+      + credentials.password);
+    const headers = new HttpHeaders({ Authorization: basicAuth });
+
+    return this.http.post<User>(`${environment.apiUrl}/auth/login`, 
+      {}, { headers }).pipe(
+      tap((user) => {
+        this.currentUser.set(user);
+        this.isAuthenticated.set(true);
+        localStorage.setItem('auth_token', basicAuth);
+        localStorage.setItem('user_data', JSON.stringify(user));
+      })
+    );
+  }
+
+  logout() {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data');
+    this.currentUser.set(null);
+    this.isAuthenticated.set(false);
+    this.router.navigate(['/login']);
+  }
+}
+\end{lstlisting}
+
+\subsection{Service de Messagerie (ChatService)}
+
+Le service gère la connexion WebSocket et les messages en temps réel :
+
+\begin{lstlisting}[language=JavaScript, caption=ChatService avec WebSocket]
+@Injectable({ providedIn: 'root' })
+export class ChatService {
+  private stompClient: Client | null = null;
+  private readonly wsUrl = 'http://localhost:8080/ws';
+
+  // Signals pour l'état réactif
+  conversations = signal<ConversationDTO[]>([]);
+  currentMessages = signal<MessageDTO[]>([]);
+  unreadCount = signal<number>(0);
+  isConnected = signal<boolean>(false);
+
+  connect(): void {
+    const user = this.authService.currentUser();
+    if (!user || this.stompClient?.connected) return;
+
+    this.stompClient = new Client({
+      webSocketFactory: () => new SockJS(this.wsUrl),
+      reconnectDelay: 5000,
+      onConnect: () => {
+        this.isConnected.set(true);
+        this.subscribeToUserMessages(user.id);
+      },
+    });
+    this.stompClient.activate();
+  }
+
+  private subscribeToUserMessages(userId: number): void {
+    this.stompClient?.subscribe(`/topic/user.${userId}`, 
+      (message: IMessage) => {
+        const newMessage: MessageDTO = JSON.parse(message.body);
+        this.handleIncomingMessage(newMessage);
+      });
+  }
+}
+\end{lstlisting}
+
+\subsection{Service de Gestion d'Amies (FriendService)}
+
+Le service gère les relations d'amitié avec mise en cache optimisée :
+
+\begin{lstlisting}[language=JavaScript, caption=FriendService avec cache]
+@Injectable({ providedIn: 'root' })
+export class FriendService {
+  // Signals pour l'état réactif
+  friends = signal<AmieDTO[]>([]);
+  receivedRequests = signal<FriendRequestDTO[]>([]);
+  sentRequests = signal<FriendRequestDTO[]>([]);
+  
+  // Cache des utilisateurs pour recherche
+  private allUsers = signal<User[]>([]);
+  private usersLoaded = signal<boolean>(false);
+
+  // Computed: utilisateurs recherchables
+  searchableUsers = computed(() => {
+    const currentUserId = this.authService.currentUser()?.id;
+    const friendIds = new Set(this.friends().map((f) => f.id));
+    return this.allUsers().filter((u) => 
+      u.id !== currentUserId && !friendIds.has(u.id));
+  });
+
+  // Recherche locale instantanée
+  searchUsers(query: string): User[] {
+    if (!query.trim()) return [];
+    const lowerQuery = query.toLowerCase();
+    return this.searchableUsers().filter((u) => {
+      const fullName = `${u.prenom} ${u.nom}`.toLowerCase();
+      return fullName.includes(lowerQuery) || 
+        u.email.toLowerCase().includes(lowerQuery);
+    });
+  }
+}
+\end{lstlisting}
+
+\section{Modèles de Données Frontend}
+
+\subsection{Interface Utilisateur}
+
+\begin{lstlisting}[language=JavaScript, caption=Modèle User]
+export interface User {
+  id: number;
+  nom: string;
+  prenom: string;
+  email: string;
+  role: string; // "ADMINISTRATEUR" ou "INSCRITE"
+  confirmed: boolean;
+  telephone?: string;
+  description?: string;
+  cin: string;
+}
+\end{lstlisting}
+
+\subsection{Interface Publication}
+
+\begin{lstlisting}[language=JavaScript, caption=Modèle Publication]
+export enum Categorie {
+  FORMATION = 'FORMATION',
+  ACHIEVEMENT = 'ACHIEVEMENT',
+}
+
+export interface Publication {
+  id: number;
+  description: string;
+  pieceJointe: string;
+  categorie: Categorie;
+  datePublication?: string;
+  utilisatrice: Author;
+}
+
+export interface PublicationRequest {
+  utilisatriceId: number;
+  description: string;
+  pieceJointe: string;
+  categorie: Categorie;
+}
+\end{lstlisting}
+
+\subsection{Interfaces Messagerie}
+
+\begin{lstlisting}[language=JavaScript, caption=Modèles Chat]
+export interface EnvoyerMessageRequest {
+  expeditricId: number;
+  destinataireId: number;
+  contenu: string;
+}
+
+export interface MessageDTO {
+  id: number;
+  conversationId: number;
+  expeditricId: number;
+  expeditriceNom: string;
+  expeditricePrenom: string;
+  contenu: string;
+  dateEnvoi: string;
+  lu: boolean;
+}
+
+export interface ConversationDTO {
+  id: number;
+  autreParticipanteId: number;
+  autreParticipanteNom: string;
+  autreParticipantePrenom: string;
+  dernierMessage: string;
+  dernierMessageDate: string;
+  messagesNonLus: number;
+}
+\end{lstlisting}
+
+\subsection{Interfaces Amitié}
+
+\begin{lstlisting}[language=JavaScript, caption=Modèles Friend]
+export type FriendRequestStatus = 'EN_ATTENTE' | 'ACCEPTEE' | 'REFUSEE';
+
+export interface FriendRequestDTO {
+  id: number;
+  expeditriceId: number;
+  expeditriceNom: string;
+  expeditricePrenom: string;
+  destinataireId: number;
+  destinataireNom: string;
+  destinatairePrenom: string;
+  statut: FriendRequestStatus;
+  dateEnvoi: string;
+  dateReponse: string | null;
+}
+
+export interface AmieDTO {
+  id: number;
+  nom: string;
+  prenom: string;
+  email: string;
+  description?: string;
+}
+\end{lstlisting}
+
+\section{Guards de Navigation}
+
+\subsection{Guard d'Authentification}
+
+\begin{lstlisting}[language=JavaScript, caption=AuthGuard]
+export const authGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAuthenticated()) {
+    return true;
+  }
+  return router.createUrlTree(['/login']);
+};
+\end{lstlisting}
+
+\subsection{Guard Administrateur}
+
+\begin{lstlisting}[language=JavaScript, caption=AdminGuard]
+export const adminGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const user = authService.currentUser();
+
+  if (user && user.role === 'ADMINISTRATEUR') {
+    return true;
+  }
+  alert('Accès refusé : Zone réservée aux administrateurs.');
+  return router.createUrlTree(['/dashboard']);
+};
+\end{lstlisting}
+
+\subsection{Guard Invité}
+
+\begin{lstlisting}[language=JavaScript, caption=GuestGuard]
+export const guestGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAuthenticated()) {
+    const user = authService.currentUser();
+    if (user?.role === 'ADMINISTRATEUR') {
+      return router.createUrlTree(['/admin']);
+    }
+    return router.createUrlTree(['/dashboard']);
+  }
+  return true;
+};
+\end{lstlisting}
+
+\section{Intercepteur HTTP}
+
+L'intercepteur ajoute automatiquement le token d'authentification à chaque requête :
+
+\begin{lstlisting}[language=JavaScript, caption=AuthInterceptor]
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authToken = localStorage.getItem('auth_token');
+  
+  if (authToken) {
+    const authReq = req.clone({
+      setHeaders: { Authorization: authToken },
+    });
+    return next(authReq);
+  }
+  return next(req);
+};
+\end{lstlisting}
+
+\section{Composants de l'Interface}
+
+\subsection{Composant Login}
+
+Le composant de connexion permet l'authentification des utilisatrices.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{screenshot_login.png}
+    \caption{Page de connexion}
+    \label{fig:login}
+\end{figure}
+
+\textbf{Caractéristiques :}
+\begin{itemize}
+    \item Formulaire réactif avec validation email/password
+    \item Redirection automatique selon le rôle (admin vs membre)
+    \item Lien vers la page d'inscription
+    \item Messages d'erreur explicites
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=Composant Login]
+@Component({
+  selector: 'app-login',
+  imports: [ReactiveFormsModule, CommonModule],
+  templateUrl: './login.html',
+  styleUrl: './login.css',
+})
+export class Login {
+  loginForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
+  });
+
+  handleLogin() {
+    if (this.loginForm.valid) {
+      this.authService.login(this.loginForm.value).subscribe({
+        next: (user) => {
+          if (user.role === "ADMINISTRATEUR") {
+            this.router.navigateByUrl('/admin');
+          } else {
+            this.router.navigateByUrl('/dashboard');
+          }
+        },
+        error: () => alert('Identifiants incorrects ou compte non validé.'),
+      });
+    }
+  }
+}
+\end{lstlisting}
+
+\subsection{Composant Inscription}
+
+Le formulaire d'inscription permet aux nouvelles utilisatrices de rejoindre la plateforme.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{screenshot_inscription.png}
+    \caption{Page d'inscription}
+    \label{fig:inscription}
+\end{figure}
+
+\textbf{Champs du formulaire :}
+\begin{itemize}
+    \item Nom et Prénom (obligatoires)
+    \item Email avec validation de format
+    \item Mot de passe (minimum 6 caractères)
+    \item Téléphone (format 10 chiffres)
+    \item CIN (obligatoire)
+    \item Description/Biographie (optionnel)
+\end{itemize}
+
+\subsection{Composant Dashboard}
+
+Le tableau de bord affiche les publications personnelles de l'utilisatrice.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{screenshot_dashboard.png}
+    \caption{Tableau de bord utilisateur}
+    \label{fig:dashboard}
+\end{figure}
+
+\textbf{Fonctionnalités :}
+\begin{itemize}
+    \item Affichage des publications personnelles avec compteur
+    \item Bouton de création de nouvelle publication
+    \item Bouton de déconnexion
+    \item Modification et suppression des publications
+    \item Accès au module Chat (bouton flottant)
+    \item Accès au module Amies (bouton flottant)
+\end{itemize}
+
+\subsection{Composant Publication Card}
+
+Chaque publication est affichée dans une carte réutilisable.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{screenshot_publication_card.png}
+    \caption{Carte de publication}
+    \label{fig:publication_card}
+\end{figure}
+
+\textbf{Éléments affichés :}
+\begin{itemize}
+    \item Avatar avec initiales de l'auteur
+    \item Nom complet de l'auteur
+    \item Date de publication formatée
+    \item Badge de catégorie (FORMATION / ACHIEVEMENT)
+    \item Description de la publication
+    \item Lien vers pièce jointe (si présente)
+    \item Boutons Modifier/Supprimer (propriétaire uniquement)
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=PublicationCard avec computed ownership]
+@Component({
+  selector: 'app-publication-card',
+  imports: [DatePipe, UpperCasePipe, ReactiveFormsModule],
+})
+export class PublicationCard {
+  @Input({ required: true }) publication!: Publication;
+  @Input({ required: true }) userId!: number;
+  @Output() deleted = new EventEmitter<number>();
+
+  isEditing = signal(false);
+  
+  // Signal calculé pour vérifier la propriété
+  isOwner = computed(() => {
+    return this.userId === this.publication.utilisatrice.id;
+  });
+
+  getInitials(): string {
+    const p = this.publication.utilisatrice.prenom.charAt(0);
+    const n = this.publication.utilisatrice.nom.charAt(0);
+    return (p + n).toUpperCase();
+  }
+}
+\end{lstlisting}
+
+\subsection{Composant Feed (Fil d'Actualités)}
+
+Le fil d'actualités affiche toutes les publications avec filtres par catégorie.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{screenshot_feed.png}
+    \caption{Fil d'actualités avec filtres}
+    \label{fig:feed}
+\end{figure}
+
+\textbf{Fonctionnalités :}
+\begin{itemize}
+    \item Barre latérale de filtres (desktop)
+    \item Filtrage par catégorie (Tout voir, Formation, Achievement)
+    \item Chargement asynchrone avec indicateur
+    \item État vide avec message explicatif
+    \item Design responsive (mobile/desktop)
+\end{itemize}
+
+\subsection{Composant Chat}
+
+Le composant de messagerie instantanée en temps réel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{screenshot_chat.png}
+    \caption{Interface de messagerie}
+    \label{fig:chat}
+\end{figure}
+
+\textbf{Fonctionnalités :}
+\begin{itemize}
+    \item Bouton flottant avec badge de messages non lus
+    \item Liste des conversations avec aperçu du dernier message
+    \item Vue des messages avec distinction envoyé/reçu
+    \item Création de nouvelle conversation avec une amie
+    \item Envoi de messages en temps réel via WebSocket
+    \item Marquage automatique des messages comme lus
+\end{itemize}
+
+\begin{lstlisting}[language=HTML, caption=Template Chat Panel]
+<!-- Bouton Chat Flottant -->
+<button class="chat-toggle" (click)="toggleChat()">
+  💬
+  @if (unreadCount() > 0) {
+    <span class="badge">{{ unreadCount() }}</span>
+  }
+</button>
+
+<!-- Panneau Chat -->
+@if (isOpen()) {
+  <div class="chat-panel">
+    <div class="chat-header">
+      @if (selectedConversation()) {
+        <button class="back-btn" (click)="backToList()">←</button>
+        <span>{{ chatTitle }}</span>
+      } @else {
+        <span>Messages</span>
+        <button class="new-chat-btn" (click)="openNewChat()">+</button>
+      }
+    </div>
+    <!-- Corps du chat -->
+  </div>
+}
+\end{lstlisting}
+
+\subsection{Composant Friends}
+
+Le composant de gestion des relations d'amitié.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{screenshot_friends.png}
+    \caption{Panneau de gestion des amies}
+    \label{fig:friends}
+\end{figure}
+
+\textbf{Onglets disponibles :}
+\begin{itemize}
+    \item \textbf{Mes Amies} : Liste des amies avec option de suppression
+    \item \textbf{Reçues} : Demandes d'amitié reçues (accepter/refuser)
+    \item \textbf{Envoyées} : Demandes envoyées en attente (annuler)
+    \item \textbf{Recherche} : Recherche instantanée d'utilisatrices
+\end{itemize}
+
+\textbf{Caractéristiques techniques :}
+\begin{itemize}
+    \item Recherche locale avec cache pour performance optimale
+    \item Badge de notification pour demandes reçues
+    \item Messages de feedback (succès/erreur)
+    \item Mise à jour réactive via Angular Signals
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=Friends avec effect() réactif]
+@Component({
+  selector: 'app-friends',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+})
+export class Friends implements OnInit {
+  searchQuery = signal<string>('');
+  searchResults = signal<User[]>([]);
+
+  constructor() {
+    // Recherche réactive instantanée
+    effect(() => {
+      const query = this.searchQuery();
+      if (this.activeTab() === 'search') {
+        this.searchResults.set(
+          this.friendService.searchUsers(query)
+        );
+      }
+    });
+  }
+}
+\end{lstlisting}
+
+\subsection{Composant Admin Dashboard}
+
+Le tableau de bord administrateur pour la validation des inscriptions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{screenshot_admin.png}
+    \caption{Tableau de bord administrateur}
+    \label{fig:admin}
+\end{figure}
+
+\textbf{Fonctionnalités :}
+\begin{itemize}
+    \item Liste des inscriptions en attente de validation
+    \item Affichage des informations : Nom, Email, CIN, Téléphone, Rôle
+    \item Actions : Valider (approuver) ou Refuser (supprimer)
+    \item Confirmation avant suppression
+    \item État vide si aucune demande en attente
+\end{itemize}
+
+\section{Styles et Design}
+
+\subsection{Palette de Couleurs}
+
+\begin{itemize}
+    \item \textbf{Primaire (Chat)} : \#6366f1 (Indigo)
+    \item \textbf{Primaire (Friends)} : \#10b981 (Vert émeraude)
+    \item \textbf{Succès} : \#28a745 (Vert)
+    \item \textbf{Danger} : \#dc3545 / \#ef4444 (Rouge)
+    \item \textbf{Avertissement} : \#f59e0b (Orange)
+    \item \textbf{Neutre} : \#6b7280, \#9ca3af (Gris)
+    \item \textbf{Fond} : \#f9fafb, \#f3f4f6 (Gris clair)
+\end{itemize}
+
+\subsection{Composants UI}
+
+\textbf{Boutons flottants :}
+\begin{lstlisting}[language=CSS, caption=Style bouton flottant]
+.chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+\end{lstlisting}
+
+\textbf{Panneaux modaux :}
+\begin{lstlisting}[language=CSS, caption=Style panneau chat]
+.chat-panel {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 360px;
+  height: 480px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+\end{lstlisting}
+
+\textbf{Cartes de publication :}
+\begin{lstlisting}[language=CSS, caption=Style carte publication]
+.card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: #6f42c1;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+\end{lstlisting}
+
+\subsection{Responsive Design}
+
+Le design s'adapte aux différentes tailles d'écran :
+
+\begin{lstlisting}[language=CSS, caption=Media queries responsive]
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .feed-layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    position: static;
+    gap: 10px;
+  }
+  .sidebar button {
+    width: auto;
+    white-space: nowrap;
+  }
+  .sidebar h3, .separator {
+    display: none;
+  }
+}
+\end{lstlisting}
+
+\section{Tests Frontend}
+
+\subsection{Tests Manuels Effectués}
+
+Les tests suivants ont été effectués pour valider le bon fonctionnement :
+
+\begin{enumerate}
+    \item \textbf{Authentification}
+    \begin{itemize}
+        \item Connexion avec identifiants valides → Redirection dashboard
+        \item Connexion admin → Redirection admin dashboard
+        \item Connexion avec identifiants invalides → Message d'erreur
+        \item Déconnexion → Retour page login, session supprimée
+    \end{itemize}
+    
+    \item \textbf{Inscription}
+    \begin{itemize}
+        \item Validation des champs obligatoires
+        \item Validation format email
+        \item Validation longueur mot de passe
+        \item Soumission réussie → Message confirmation
+    \end{itemize}
+    
+    \item \textbf{Publications}
+    \begin{itemize}
+        \item Création publication → Apparition dans liste
+        \item Modification publication personnelle → Mise à jour
+        \item Suppression publication → Disparition de la liste
+        \item Filtrage par catégorie → Affichage correct
+    \end{itemize}
+    
+    \item \textbf{Messagerie}
+    \begin{itemize}
+        \item Connexion WebSocket → Indicateur connecté
+        \item Envoi message → Réception temps réel
+        \item Badge messages non lus → Mise à jour
+        \item Création nouvelle conversation → Succès
+    \end{itemize}
+    
+    \item \textbf{Amies}
+    \begin{itemize}
+        \item Recherche utilisatrice → Résultats instantanés
+        \item Envoi demande amitié → Statut "Envoyée"
+        \item Acceptation demande → Amie ajoutée
+        \item Suppression amie → Retrait de la liste
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Compatibilité Navigateurs}
+
+L'application a été testée sur :
+\begin{itemize}
+    \item Google Chrome 120+
+    \item Mozilla Firefox 120+
+    \item Microsoft Edge 120+
+    \item Safari 17+
+\end{itemize}
+
+\section{Déploiement Frontend}
+
+\subsection{Prérequis}
+
+\begin{itemize}
+    \item Node.js 18+ ou supérieur
+    \item npm 9+ ou supérieur
+    \item Angular CLI 21.1.0
+\end{itemize}
+
+\subsection{Installation et Lancement}
+
+\begin{lstlisting}[language=bash, caption=Commandes de déploiement frontend]
+# Cloner le repository
+git clone https://github.com/user/PI-frontend.git
+cd PI-frontend
+
+# Installer les dépendances
+npm install
+
+# Lancement en développement
+npm start
+# ou
+ng serve
+
+# L'application est accessible sur http://localhost:4200
+
+# Build de production
+ng build --configuration production
+
+# Les fichiers sont générés dans dist/
+\end{lstlisting}
+
+\subsection{Configuration Environnement}
+
+Le fichier \texttt{environment.ts} configure l'URL de l'API backend :
+
+\begin{lstlisting}[language=JavaScript, caption=Configuration environnement]
+export const environment = {
+  production: false,
+  apiUrl: "http://localhost:8080/api"
+};
+\end{lstlisting}
+
+Pour la production, créer \texttt{environment.prod.ts} avec l'URL du serveur de production.
+
+\chapter{Conclusion}
+
+\section{Résumé des Réalisations}
+
+Ce projet a permis la conception et le développement d'une plateforme collaborative complète pour les femmes en STEM. L'ensemble du système offre :
+
+\subsection{Backend}
+\begin{itemize}
+    \item Une API REST complète avec 30+ endpoints
+    \item Un système d'authentification sécurisé par Basic Auth
+    \item Une messagerie instantanée en temps réel via WebSocket
+    \item Un système complet de gestion d'amitié avec demandes
+    \item Un module de publications avec catégories
+    \item Un panneau d'administration pour la modération
+    \item Une architecture scalable et maintenable
+\end{itemize}
+
+\subsection{Frontend}
+\begin{itemize}
+    \item Une application Angular 21 moderne avec Standalone Components
+    \item Une gestion d'état réactive avec Angular Signals
+    \item 9 composants réutilisables (Login, Inscription, Dashboard, etc.)
+    \item 5 services métier (Auth, Users, Publications, Chat, Friends)
+    \item 3 guards de navigation (Auth, Admin, Guest)
+    \item Un intercepteur HTTP pour l'authentification automatique
+    \item Une interface de chat en temps réel avec WebSocket
+    \item Un système de gestion d'amies avec recherche instantanée
+    \item Un design responsive adapté mobile et desktop
+\end{itemize}
+
+\section{Difficultés Rencontrées}
+
+\subsection{Défis Techniques}
+\begin{itemize}
+    \item Configuration WebSocket avec SockJS (polyfill global nécessaire)
+    \item Gestion des sessions avec Angular Signals
+    \item Optimisation de la recherche utilisateurs (mise en cache)
+    \item Synchronisation REST API et WebSocket pour la messagerie
+\end{itemize}
+
+\subsection{Solutions Apportées}
+\begin{itemize}
+    \item Ajout polyfill \texttt{var global = window} dans index.html
+    \item Utilisation de \texttt{effect()} pour la réactivité des recherches
+    \item Cache local des utilisateurs avec \texttt{computed()} signals
+    \item Fallback REST si WebSocket non disponible
+\end{itemize}
+
+\section{Perspectives d'Évolution}
+
+\subsection{Améliorations Court Terme}
+\begin{itemize}
+    \item Système de notifications push
+    \item Upload de fichiers (images, documents)
+    \item Recherche avancée avec filtres
+    \item Gestion de groupes de discussion
+\end{itemize}
+
+\subsection{Fonctionnalités Futures}
+\begin{itemize}
+    \item Système de recommandations d'amies
+    \item Événements et webinaires en ligne
+    \item Marketplace de formations
+    \item Gamification et badges de réalisation
+    \item Application mobile native (iOS/Android)
+    \item Traduction multilingue
+\end{itemize}
+
+\subsection{Optimisations Techniques}
+\begin{itemize}
+    \item Mise en cache Redis pour améliorer les performances
+    \item Migration vers architecture microservices
+    \item Implémentation de GraphQL en complément de REST
+    \item CDN pour la distribution de contenu statique
+    \item Monitoring et alerting avec Prometheus/Grafana
+\end{itemize}
+
+\section{Impact Attendu}
+
+Cette plateforme vise à :
+
+\begin{enumerate}
+    \item \textbf{Réduire l'isolement} des femmes en STEM en créant une communauté solidaire
+    \item \textbf{Faciliter le networking} professionnel et le mentorat
+    \item \textbf{Valoriser les réalisations} et parcours des femmes dans ces domaines
+    \item \textbf{Encourager les échanges} d'opportunités de formation et de carrière
+    \item \textbf{Créer des modèles} inspirants pour les nouvelles générations
+\end{enumerate}
+
+\section{Remerciements}
+
+Je tiens à remercier toutes les personnes qui ont contribué à la réalisation de ce projet, notamment les enseignants du MIT pour leur encadrement, ainsi que les futures utilisatrices qui participeront à l'amélioration continue de la plateforme.
+
+\appendix
+
+\chapter{Annexes}
+
+\section{Configuration du Projet}
+
+\subsection{pom.xml - Dépendances Maven (Backend)}
+
+\begin{lstlisting}[language=xml, caption=Principales dépendances backend]
+<dependencies>
+    <!-- Spring Boot Starter Web -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    
+    <!-- Spring Boot Starter Data JPA -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    
+    <!-- Spring Boot Starter Security -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    
+    <!-- Spring Boot Starter WebSocket -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-websocket</artifactId>
+    </dependency>
+    
+    <!-- MariaDB Driver -->
+    <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+    </dependency>
+    
+    <!-- Lombok -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+</dependencies>
+\end{lstlisting}
+
+\subsection{package.json - Dépendances npm (Frontend)}
+
+\begin{lstlisting}[language=json, caption=Dépendances frontend]
+{
+  "name": "femmes-stem-frontend",
+  "version": "0.0.0",
+  "dependencies": {
+    "@angular/common": "^21.1.0",
+    "@angular/compiler": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.0",
+    "@angular/platform-browser": "^21.1.0",
+    "@angular/router": "^21.1.0",
+    "@stomp/stompjs": "^7.2.1",
+    "@types/sockjs-client": "^1.5.4",
+    "rxjs": "~7.8.0",
+    "sockjs-client": "^1.6.1",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.1.0",
+    "@angular/cli": "^21.1.0",
+    "@angular/compiler-cli": "^21.1.0",
+    "typescript": "~5.9.2"
+  }
+}
+\end{lstlisting}
+
+\section{Glossaire}
+
+\begin{description}
+    \item[API] Application Programming Interface - Interface de programmation
+    \item[DTO] Data Transfer Object - Objet de transfert de données
+    \item[JPA] Java Persistence API - API de persistance Java
+    \item[JWT] JSON Web Token - Token d'authentification
+    \item[ORM] Object-Relational Mapping - Mapping objet-relationnel
+    \item[REST] Representational State Transfer - Style d'architecture web
+    \item[SPA] Single Page Application - Application mono-page
+    \item[STEM] Science, Technology, Engineering, Mathematics
+    \item[STOMP] Simple Text Oriented Messaging Protocol
+    \item[WebSocket] Protocole de communication bidirectionnelle
+    \item[Signal] Primitive réactive d'Angular pour la gestion d'état
+    \item[Guard] Mécanisme de protection des routes Angular
+    \item[Interceptor] Middleware HTTP pour modifier les requêtes/réponses
+\end{description}
+
+\section{Références}
+
+\begin{enumerate}
+    \item Spring Framework Documentation - https://spring.io/docs
+    \item Spring Boot Reference Guide - https://docs.spring.io/spring-boot/docs/current/reference/html/
+    \item Spring Data JPA - https://spring.io/projects/spring-data-jpa
+    \item Angular Documentation - https://angular.dev
+    \item Angular Signals - https://angular.dev/guide/signals
+    \item STOMP.js Documentation - https://stomp-js.github.io/stomp-websocket/
+    \item SockJS Client - https://github.com/sockjs/sockjs-client
+    \item WebSocket Protocol RFC 6455 - https://tools.ietf.org/html/rfc6455
+    \item MariaDB Documentation - https://mariadb.com/kb/en/documentation/
+    \item TypeScript Documentation - https://www.typescriptlang.org/docs/
+\end{enumerate}
+
+\end{document}
