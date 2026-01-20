@@ -47,7 +47,7 @@
         <div class="conversations-list">
           @for (conv of conversations(); track conv.id) {
             <div class="conversation-item" (click)="selectConversation(conv)">
-              <div class="conv-avatar">{{ conv.autreParticipantePrenom?.charAt(0) || conv.autreParticipanteNom.charAt(0) }}</div>
+              <div class="conv-avatar">{{ conv.autreParticipantePrenom.charAt(0) || conv.autreParticipanteNom.charAt(0) }}</div>
               <div class="conv-info">
                 <div class="conv-name">{{ conv.autreParticipantePrenom }} {{ conv.autreParticipanteNom }}</div>
                 <div class="conv-preview">{{ conv.dernierMessage }}</div>

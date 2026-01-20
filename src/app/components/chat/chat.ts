@@ -69,9 +69,7 @@ export class Chat implements OnInit, OnDestroy {
 
   selectFriendForChat(friend: AmieDTO): void {
     // Check if conversation already exists with this friend
-    const existingConvo = this.conversations().find(
-      (c) => c.autreParticipanteId === friend.id
-    );
+    const existingConvo = this.conversations().find((c) => c.autreParticipanteId === friend.id);
 
     if (existingConvo) {
       this.selectConversation(existingConvo);
@@ -134,7 +132,7 @@ export class Chat implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Failed to send message:', err);
-        alert(err.error || 'Erreur lors de l\'envoi du message');
+        alert(err.error || "Erreur lors de l'envoi du message");
       },
     });
 

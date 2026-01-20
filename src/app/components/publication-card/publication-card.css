@@ -331,3 +331,107 @@ textarea:focus {
   background: #9ca3af;
   cursor: not-allowed;
 }
+
+/* Adjust footer for spacer */
+.card-footer {
+  display: flex;
+  align-items: center;
+}
+.spacer {
+  flex: 1;
+}
+
+/* COMMENTS STYLES */
+.comments-section {
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+  margin: -16px -16px -16px -16px;
+  padding: 16px;
+  border-radius: 0 0 12px 12px;
+  margin-top: 15px;
+}
+
+.add-comment {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.add-comment input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  outline: none;
+}
+.add-comment button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.add-comment button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.comment-item {
+  background: white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: 5px;
+}
+.comment-author {
+  font-weight: bold;
+  color: #333;
+}
+.comment-date {
+  color: #888;
+}
+
+.comment-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.comment-body p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+  word-wrap: break-word;
+  flex: 1;
+}
+
+.btn-delete-comment {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-left: 10px;
+  opacity: 0.6;
+}
+.btn-delete-comment:hover {
+  opacity: 1;
+}
+
+.loading-text,
+.no-comments {
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  font-style: italic;
+}

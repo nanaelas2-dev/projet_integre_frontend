@@ -23,6 +23,7 @@ export class PublicationCard implements OnInit {
   private commentService = inject(CommentService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
+  private commentaireService = inject(CommentaireService);
 
   // State
   isEditing = signal(false);
@@ -37,6 +38,16 @@ export class PublicationCard implements OnInit {
   ngOnInit() {
     this.loadComments();
   }
+
+  // --- NEW COMMENT SIGNALS ---
+  // Controls visibility (Is the comment box open or closed?)
+  showComments = signal(false);
+  // Stores the data (The list of comments from the database)
+  comments = signal<Commentaire[]>([]);
+  // UI Feedback (For slow internet)
+  isLoadingComments = signal(false);
+  // Form Input (What is the user typing right now?)
+  newCommentText = signal('');
 
   // Computed Signal for Ownership
   isOwner = computed(() => {

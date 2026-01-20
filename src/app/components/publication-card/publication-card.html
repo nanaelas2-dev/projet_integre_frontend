@@ -50,11 +50,66 @@
     }
   </div>
 
-  <!-- FOOTER: Only show if OWNING the post -->
-  @if (!isEditing() && isOwner()) {
   <div class="card-footer">
+    <!-- Comment Toggle Button -->
+    <button (click)="toggleComments()" class="btn-icon">💬 Commentaires</button>
+
+    <!-- Spacer to push edit/delete to the right -->
+    <span class="spacer"></span>
+
+    <!-- Edit/Delete (Only if owner) -->
+    @if (!isEditing() && isOwner()) {
     <button (click)="toggleEdit()" class="btn-icon">Modifier</button>
     <button (click)="onDelete()" class="btn-icon delete">Supprimer</button>
+    }
+  </div>
+
+  @if (showComments()) {
+  <div class="comments-section">
+    <!-- Add Comment Form -->
+    <!-- [ngModel]: If you change the signal in code (like clearing it), the input clears. -->
+    <!--(ngModelChange): If you type in the box, the signal updates. -->
+    <!--(keyup.enter): Allows submitting without clicking the "Envoyer" button with enter key.-->
+    <div class="add-comment">
+      <input
+        type="text"
+        placeholder="Écrire un commentaire..."
+        [ngModel]="newCommentText()"
+        (ngModelChange)="newCommentText.set($event)"
+        (keyup.enter)="addComment()"
+      />
+      <button [disabled]="!newCommentText().trim()" (click)="addComment()">Envoyer</button>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoadingComments()) {
+    <p class="loading-text">Chargement des commentaires...</p>
+    }
+
+    <!-- Comments List -->
+    <div class="comments-list">
+      @for (comment of comments(); track comment.id) {
+      <div class="comment-item">
+        <div class="comment-header">
+          <span class="comment-author">
+            {{ comment.utilisateur.prenom }} {{ comment.utilisateur.nom }}
+          </span>
+          <span class="comment-date">{{ comment.createdAt | date:'dd/MM HH:mm' }}</span>
+        </div>
+
+        <div class="comment-body">
+          <p>{{ comment.contenu }}</p>
+
+          <!-- Delete Comment (Only if owner of the comment) -->
+          @if (isCommentOwner(comment)) {
+          <button class="btn-delete-comment" (click)="deleteComment(comment.id)">✖</button>
+          }
+        </div>
+      </div>
+      } @empty { @if (!isLoadingComments()) {
+      <p class="no-comments">Soyez la première à commenter !</p>
+      } }
+    </div>
   </div>
   }
 
