@@ -19,6 +19,7 @@
   <!-- BODY -->
   <div class="card-body">
     @if (!isEditing()) {
+    <!-- VIEW MODE -->
     <p class="description">{{ publication.description }}</p>
 
     @if (publication.pieceJointe) {
@@ -61,7 +62,7 @@
       } }
     </div>
     } } @else {
-    <!-- EDIT FORM -->
+    <!-- EDIT MODE (Form) -->
     <form [formGroup]="editForm" (ngSubmit)="onSave()">
       <!-- Category -->
       <div class="form-group">
@@ -102,17 +103,13 @@
         <!-- FILE -->
         @if (editMode() === 'FILE') {
         <div class="file-input-wrapper">
-          <!-- Hidden Input -->
           <input #fileInput type="file" (change)="onFileSelected($event)" style="display: none" />
-
           <button type="button" class="btn-secondary" (click)="fileInput.click()">
             {{ newFile() ? '📁 Fichier sélectionné' : '📂 Changer le fichier' }}
           </button>
-
           @if (newFile()) {
           <span class="file-name">{{ newFile()?.name }}</span>
           } @else {
-          <!-- Helper text to show we are keeping the old one -->
           <span class="file-name hint"> (Laisser vide pour garder l'actuel) </span>
           }
         </div>
@@ -138,9 +135,23 @@
     }
   </div>
 
+  <!-- FOOTER ACTIONS -->
   <div class="card-footer">
     <!-- Comment Toggle Button -->
-    <button (click)="toggleComments()" class="btn-icon">💬 Commentaires</button>
+    <button (click)="toggleComments()" class="btn-toggle-comments">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      {{ comments().length }} {{ comments().length === 1 ? 'commentaire' : 'commentaires' }}
+    </button>
 
     <!-- Spacer to push edit/delete to the right -->
     <span class="spacer"></span>
@@ -152,23 +163,9 @@
     }
   </div>
 
-  @if (showComments()) {
+  <!-- COMMENTS SECTION -->
+  @if (showComments() && !isEditing()) {
   <div class="comments-section">
-    <!-- Add Comment Form -->
-    <!-- [ngModel]: If you change the signal in code (like clearing it), the input clears. -->
-    <!--(ngModelChange): If you type in the box, the signal updates. -->
-    <!--(keyup.enter): Allows submitting without clicking the "Envoyer" button with enter key.-->
-    <div class="add-comment">
-      <input
-        type="text"
-        placeholder="Écrire un commentaire..."
-        [ngModel]="newCommentText()"
-        (ngModelChange)="newCommentText.set($event)"
-        (keyup.enter)="addComment()"
-      />
-      <button [disabled]="!newCommentText().trim()" (click)="addComment()">Envoyer</button>
-    </div>
-
     <!-- Loading State -->
     @if (isLoadingComments()) {
     <p class="loading-text">Chargement des commentaires...</p>
@@ -178,15 +175,19 @@
     <div class="comments-list">
       @for (comment of comments(); track comment.id) {
       <div class="comment-item">
-        <div class="comment-header">
-          <span class="comment-author">
-            {{ comment.utilisateur.prenom }} {{ comment.utilisateur.nom }}
-          </span>
-          <span class="comment-date">{{ comment.createdAt | date:'dd/MM HH:mm' }}</span>
-        </div>
+        <div class="comment-avatar">{{ getCommentAuthorInitials(comment) }}</div>
 
-        <div class="comment-body">
-          <p>{{ comment.contenu }}</p>
+        <div class="comment-content">
+          <div class="comment-header">
+            <!-- Updated to match Commentaire model (nested utilisateur) -->
+            <span class="comment-author">
+              {{ comment.utilisateur.prenom }} {{ comment.utilisateur.nom }}
+            </span>
+            <!-- Updated to match Commentaire model (createdAt) -->
+            <span class="comment-date">{{ comment.createdAt | date:'dd MMM HH:mm' }}</span>
+          </div>
+
+          <p class="comment-text">{{ comment.contenu }}</p>
 
           <!-- Delete Comment (Only if owner of the comment) -->
           @if (isCommentOwner(comment)) {
@@ -198,61 +199,31 @@
       <p class="no-comments">Soyez la première à commenter !</p>
       } }
     </div>
-  </div>
-  }
 
-  <!-- COMMENTS SECTION -->
-  @if (!isEditing()) {
-  <div class="comments-section">
-    <button (click)="toggleComments()" class="btn-toggle-comments">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      </svg>
-      {{ comments().length }} {{ comments().length === 1 ? 'commentaire' : 'commentaires' }}
-    </button>
-
-    @if (showComments()) {
-    <div class="comments-container">
-      <!-- Comments List -->
-      @if (comments().length > 0) {
-        <div class="comments-list">
-          @for (comment of comments(); track comment.id) {
-          <div class="comment-item">
-            <div class="comment-avatar">{{ getCommentAuthorInitials(comment) }}</div>
-            <div class="comment-content">
-              <div class="comment-header">
-                <span class="comment-author">{{ comment.prenomUtilisateur }} {{ comment.nomUtilisateur }}</span>
-                <span class="comment-date">{{ comment.dateCreation | date:'dd MMM HH:mm' }}</span>
-              </div>
-              <p class="comment-text">{{ comment.contenu }}</p>
-              @if (comment.idUtilisateur === userId) {
-                <button (click)="deleteComment(comment.id)" class="btn-delete-comment">Supprimer</button>
-              }
-            </div>
-          </div>
-          }
-        </div>
-      } @else {
-        <p class="no-comments">Aucun commentaire pour le moment</p>
-      }
-
-      <!-- Add Comment Form -->
-      <div class="add-comment-form">
-        <input 
-          type="text" 
-          [(ngModel)]="newComment" 
-          placeholder="Ajouter un commentaire..."
-          (keyup.enter)="addComment()"
-        />
-        <button (click)="addComment()" [disabled]="!newComment.trim()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
-      </div>
+    <!-- Add Comment Form -->
+    <div class="add-comment-form">
+      <input
+        type="text"
+        [ngModel]="newCommentText()"
+        (ngModelChange)="newCommentText.set($event)"
+        placeholder="Ajouter un commentaire..."
+        (keyup.enter)="addComment()"
+      />
+      <button (click)="addComment()" [disabled]="!newCommentText().trim()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
     </div>
-    }
   </div>
   }
 </div>

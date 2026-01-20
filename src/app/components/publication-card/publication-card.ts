@@ -1,4 +1,13 @@
-import { Component, computed, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  signal,
+} from '@angular/core';
 import {
   Categorie,
   Publication,
@@ -24,61 +33,68 @@ export class PublicationCard implements OnInit {
   @Input({ required: true }) userId!: number; // Needed to rebuild DTO
   @Output() deleted = new EventEmitter<number>(); // Notify parent to remove from list
 
+  // Services
   private service = inject(PublicationService);
-  private commentService = inject(CommentService);
-  private authService = inject(AuthService);
-  private fb = inject(FormBuilder);
   private commentaireService = inject(CommentaireService);
+  private fb = inject(FormBuilder);
 
+  // Constants
   Type = TypePieceJointe;
-
-  // State
-  isEditing = signal(false);
   categories = Object.values(Categorie);
-  
-  // Comments state
-  comments = signal<Commentaire[]>([]);
-  showComments = signal(false);
-  newComment = '';
-  isLoadingComments = signal(false);
 
-  ngOnInit() {
-    this.loadComments();
-  }
+  // --- STATE SIGNALS ---
 
-  // We need these to track if the user changes the file during edit
+  // Edit Mode
+  isEditing = signal(false);
   editMode = signal<'FILE' | 'LINK'>('FILE');
   newFile = signal<File | null>(null);
 
-  // --- NEW COMMENT SIGNALS ---
-  // Controls visibility (Is the comment box open or closed?)
+  // Comment Mode
   showComments = signal(false);
-  // Stores the data (The list of comments from the database)
   comments = signal<Commentaire[]>([]);
-  // UI Feedback (For slow internet)
   isLoadingComments = signal(false);
   // Form Input (What is the user typing right now?)
   newCommentText = signal('');
 
-  // Computed Signal for Ownership
+  // Check if current user owns the publication
   isOwner = computed(() => {
     // Compare LoggedIn ID vs Author ID
     return this.userId === this.publication.utilisatrice.id;
   });
 
-  // Helper to show initials
+  // Form Configuration
+  editForm = this.fb.group({
+    categorie: ['', Validators.required],
+    description: ['', [Validators.required, Validators.minLength(10)]],
+    lien: [''],
+  });
+
+  ngOnInit() {
+    // We load comments initially to get the count for the badge
+    this.loadComments();
+  }
+
+  // --- HELPERS ---
+
   getInitials(): string {
     const p = this.publication.utilisatrice.prenom.charAt(0);
     const n = this.publication.utilisatrice.nom.charAt(0);
     return (p + n).toUpperCase();
   }
 
-  // Form
-  editForm = this.fb.group({
-    categorie: ['', Validators.required],
-    description: ['', [Validators.required, Validators.minLength(10)]],
-    lien: [''],
-  });
+  // Helper for Comment Author Initials (using nested user object)
+  getCommentAuthorInitials(comment: Commentaire): string {
+    const p = comment.utilisateur.prenom.charAt(0);
+    const n = comment.utilisateur.nom.charAt(0);
+    return (p + n).toUpperCase();
+  }
+
+  // Helper to check if current user owns a specific comment
+  isCommentOwner(comment: Commentaire): boolean {
+    return comment.utilisateur.id === this.userId;
+  }
+
+  // --- EDIT LOGIC ---
 
   // Toggle between View/Edit
   toggleEdit() {
@@ -90,7 +106,7 @@ export class PublicationCard implements OnInit {
         description: this.publication.description,
       });
 
-      // 2. Determine Initial Mode based on existing type
+      // Determine Initial Mode based on existing type
       const currentType = this.publication.type_piece_jointe;
 
       if (currentType === TypePieceJointe.IMAGE || currentType === TypePieceJointe.PDF) {
@@ -137,7 +153,6 @@ export class PublicationCard implements OnInit {
         lien: this.editMode() === 'LINK' ? formVal.lien || null : null
       };
 
-      // Call Backend
       this.service.updatePublication(this.publication.id, request).subscribe({
         next: (updatedPub) => {
           // Update local view immediately
@@ -154,7 +169,6 @@ export class PublicationCard implements OnInit {
     if (confirm('Voulez-vous vraiment supprimer cette publication ?')) {
       this.service.deletePublication(this.publication.id).subscribe({
         next: () => {
-          // Emit event so Dashboard removes it from the list
           this.deleted.emit(this.publication.id);
         },
         error: (err) => console.error(err),
@@ -162,10 +176,19 @@ export class PublicationCard implements OnInit {
     }
   }
 
-  // Comments methods
+  // --- COMMENT LOGIC ---
+
+  toggleComments() {
+    this.showComments.set(!this.showComments());
+    // Refresh if opening and empty
+    if (this.showComments() && this.comments().length === 0) {
+      this.loadComments();
+    }
+  }
+
   loadComments() {
     this.isLoadingComments.set(true);
-    this.commentService.getCommentsByPublication(this.publication.id).subscribe({
+    this.commentaireService.getByPublication(this.publication.id).subscribe({
       next: (data) => {
         this.comments.set(data);
         this.isLoadingComments.set(false);
@@ -177,26 +200,21 @@ export class PublicationCard implements OnInit {
     });
   }
 
-  toggleComments() {
-    this.showComments.set(!this.showComments());
-  }
-
   addComment() {
-    if (!this.newComment.trim()) return;
+    const content = this.newCommentText().trim();
+    if (!content) return;
 
-    const currentUser = this.authService.currentUser();
-    if (!currentUser) return;
-
-    const request = {
-      contenu: this.newComment.trim(),
-      idUtilisateur: currentUser.id,
+    const request: CreateCommentaireRequest = {
+      contenu: content,
+      idUtilisateur: this.userId,
       idPublication: this.publication.id,
     };
 
-    this.commentService.addComment(request).subscribe({
+    this.commentaireService.create(request).subscribe({
       next: (comment) => {
-        this.comments.update(prev => [...prev, comment]);
-        this.newComment = '';
+        // Update the list immediately
+        this.comments.update((prev) => [...prev, comment]);
+        this.newCommentText.set(''); // Clear input
       },
       error: (err) => console.error('Error adding comment:', err),
     });
@@ -204,18 +222,12 @@ export class PublicationCard implements OnInit {
 
   deleteComment(commentId: number) {
     if (confirm('Voulez-vous supprimer ce commentaire ?')) {
-      this.commentService.deleteComment(commentId).subscribe({
+      this.commentaireService.delete(commentId).subscribe({
         next: () => {
-          this.comments.update(prev => prev.filter(c => c.id !== commentId));
+          this.comments.update((prev) => prev.filter((c) => c.id !== commentId));
         },
         error: (err) => console.error('Error deleting comment:', err),
       });
     }
-  }
-
-  getCommentAuthorInitials(comment: Commentaire): string {
-    const prenom = comment.prenomUtilisateur || 'U';
-    const nom = comment.nomUtilisateur || 'U';
-    return (prenom.charAt(0) + nom.charAt(0)).toUpperCase();
   }
 }
